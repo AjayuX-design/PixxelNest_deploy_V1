@@ -3,1023 +3,1303 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PixxelNest, A studio for the details</title>
+<title>PixxelNest — A studio for the details</title>
+<meta name="description" content="PixxelNest is a small, opinionated design studio building brands, websites, and campaigns that move the needle.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
 <style>
-  :root {
-    --bg: #F4EEE3;
-    --bg-soft: #EFE6D6;
-    --card: #FAF5EA;
-    --card-highlight: #F2DFC4;
-    --ink: #1C1814;
-    --ink-soft: #3A332C;
-    --muted: #8A8074;
-    --hairline: rgba(28, 24, 20, 0.10);
-    --hairline-soft: rgba(28, 24, 20, 0.06);
-    --accent: #E55A3C;
-    --accent-soft: #F18F76;
-
-    --font-display: 'Geist', 'Inter', system-ui, sans-serif;
-    --font-body: 'Inter', system-ui, sans-serif;
-    --font-serif: 'Instrument Serif', 'Fraunces', Georgia, serif;
-
-    --section-py: clamp(80px, 10vw, 140px);
-    --container-px: clamp(20px, 4vw, 56px);
-    --container-max: 1320px;
-
-    --radius-sm: 10px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --radius-xl: 32px;
-
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 16px;
-    line-height: 1.6;
-    font-feature-settings: "ss01", "cv11";
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.5;
-    mix-blend-mode: multiply;
-    z-index: 1;
-  }
-
-  #root { position: relative; z-index: 2; }
-
-  ::selection { background: var(--accent); color: var(--bg); }
-
-  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-  a { color: inherit; text-decoration: none; }
-
-  .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
-  }
-  .reveal.in { opacity: 1; transform: translateY(0); }
-  .reveal-delay-1 { transition-delay: 0.08s; }
-  .reveal-delay-2 { transition-delay: 0.16s; }
-  .reveal-delay-3 { transition-delay: 0.24s; }
-  .reveal-delay-4 { transition-delay: 0.32s; }
-  .reveal-delay-5 { transition-delay: 0.40s; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    html { scroll-behavior: auto; }
-  }
-
-  /* Image slot placeholder */
-  .img-slot {
-    background: var(--bg-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    font-size: 13px;
-    font-style: italic;
-    text-align: center;
-    padding: 16px;
-  }
-</style>
-
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
-</head>
-<body>
-  <div id="root"></div>
-
-<script type="text/babel">
-const { useEffect, useRef, useState } = React;
-
-// ─── Icons ────────────────────────────────────────────────────
-const IconArrow = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2.5 7h9M7.5 3l4 4-4 4"/>
-  </svg>
-);
-const IconPlus = () => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-    <path d="M6 1v10M1 6h10"/>
-  </svg>
-);
-const IconGlobe = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="14" cy="14" r="10"/><path d="M14 4c-3 4-3 16 0 20M14 4c3 4 3 16 0 20M4 14h20M5 9h18M5 19h18"/>
-  </svg>
-);
-const IconPalette = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 14a10 10 0 1 0 16.5-7.6c-1.4-1.2-3-1.7-4.5-1.3-1 .3-1.5 1-2 2l-1 3-3 1c-1 .5-1.7 1-2 2-.3 1.5.3 3.2 1.5 4.5.6.6 1.3 1 2 1.4"/>
-    <circle cx="9" cy="18" r="1.5" fill="currentColor"/>
-    <circle cx="19" cy="18" r="1.5" fill="currentColor"/>
-    <circle cx="14" cy="22" r="1.5" fill="currentColor"/>
-  </svg>
-);
-const IconImage = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="22" height="22" rx="4"/><circle cx="10" cy="10" r="2"/><path d="M3 19l6-6 4 4 3-3 6 6"/>
-  </svg>
-);
-const IconChart = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 24V12l6-6 6 6 6-9"/><path d="M4 24h20"/>
-  </svg>
-);
-const IconSearch = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="8"/><path d="M18 18l6 6"/>
-  </svg>
-);
-const IconShield = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 3L4 7v8c0 6 4.5 10 10 11 5.5-1 10-5 10-11V7L14 3z"/>
-    <path d="M9 14l3 3 6-6"/>
-  </svg>
-);
-
-// ─── Primitives ───────────────────────────────────────────────
-const Container = ({ children, style, className }) => (
-  <div className={className} style={{
-    maxWidth: 'var(--container-max)',
-    margin: '0 auto',
-    paddingLeft: 'var(--container-px)',
-    paddingRight: 'var(--container-px)',
-    position: 'relative',
-    ...style
-  }}>{children}</div>
-);
-
-const Eyebrow = ({ children, dark }) => (
-  <div style={{
-    display: 'inline-flex', alignItems: 'center', gap: 10,
-    fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase',
-    fontWeight: 500, color: dark ? 'rgba(244,238,227,0.65)' : 'var(--muted)'
-  }}>
-    <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />
-    {children}
-  </div>
-);
-
-const MagneticButton = ({ children, primary, dark, href = '#', onClick, style }) => {
-  const ref = useRef(null);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const handleMove = (e) => {
-    const el = ref.current; if (!el) return;
-    const r = el.getBoundingClientRect();
-    setPos({ x: (e.clientX - r.left - r.width / 2) * 0.25, y: (e.clientY - r.top - r.height / 2) * 0.35 });
-  };
-  const handleLeave = () => setPos({ x: 0, y: 0 });
-  const bg = primary ? 'var(--accent)' : dark ? 'var(--ink)' : 'transparent';
-  const color = primary ? '#FFF7F0' : dark ? 'var(--bg)' : 'var(--ink)';
-  const border = primary || dark ? 'transparent' : 'var(--hairline)';
-  return (
-    <a ref={ref} href={href} onClick={onClick} onMouseMove={handleMove} onMouseLeave={handleLeave}
-      style={{
-        display: 'inline-flex', alignItems: 'center', gap: 10,
-        padding: '15px 24px', borderRadius: 999,
-        background: bg, color, fontSize: 14, fontWeight: 500, letterSpacing: '-0.005em',
-        border: `1px solid ${border}`,
-        transform: `translate(${pos.x}px, ${pos.y}px)`,
-        transition: 'transform 0.4s var(--ease), background 0.3s, color 0.3s',
-        willChange: 'transform', ...style
-      }}>
-      {children}
-    </a>
-  );
-};
-
-const Logo = () => (
-  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-    <rect x="3" y="3" width="10" height="10" rx="2" fill="var(--ink)" />
-    <rect x="15" y="3" width="10" height="10" rx="2" fill="var(--accent)" />
-    <rect x="3" y="15" width="10" height="10" rx="2" fill="var(--accent)" />
-    <rect x="15" y="15" width="10" height="10" rx="2" fill="var(--ink)" />
-  </svg>
-);
-
-const ImgSlot = ({ placeholder, style }) => (
-  <div className="img-slot" style={{ width: '100%', height: '100%', ...style }}>
-    {placeholder}
-  </div>
-);
-
-const useReveal = () => {
-  const ref = useRef(null);
-  useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
-    const nodes = el.querySelectorAll('.reveal');
-    nodes.forEach((n) => {
-      if (n.getBoundingClientRect().top < window.innerHeight * 0.95) n.classList.add('in');
-      else io.observe(n);
-    });
-    return () => io.disconnect();
-  }, []);
-  return ref;
-};
-
-// ─── Rotating Word ────────────────────────────────────────────
-const RotatingWord = ({ words }) => {
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setIdx(i => (i + 1) % words.length), 2400);
-    return () => clearInterval(id);
-  }, [words.length]);
-  return (
-    <span style={{ position: 'relative', display: 'inline-block', verticalAlign: 'baseline', whiteSpace: 'nowrap' }}>
-      <span aria-hidden="true" style={{ visibility: 'hidden', display: 'inline-block' }}>
-        {words.reduce((a, b) => (a.length > b.length ? a : b), '')}
-      </span>
-      {words.map((w, i) => (
-        <span key={i} style={{
-          position: 'absolute', left: 0, top: 0,
-          fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontWeight: 400, color: 'var(--accent)',
-          opacity: idx === i ? 1 : 0,
-          transform: idx === i ? 'translateY(0)' : 'translateY(0.25em)',
-          transition: 'opacity 0.55s var(--ease), transform 0.55s var(--ease)',
-        }}>{w}.</span>
-      ))}
-    </span>
-  );
-};
-
-// ─── Trusted By ───────────────────────────────────────────────
-const TrustedBy = () => {
-  const logos = ['FORELAND', 'Northbound', 'Maison Vie', 'Halcyon', 'Ortega&Co', 'Quiet Studio'];
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', flexWrap: 'wrap',
-      gap: 'clamp(20px, 3vw, 40px)', paddingTop: 24, borderTop: '1px solid var(--hairline)'
-    }}>
-      <span style={{ fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)', fontWeight: 500 }}>Trusted by</span>
-      {logos.map((l, i) => (
-        <span key={l} style={{
-          fontFamily: i % 2 === 0 ? 'var(--font-display)' : 'var(--font-serif)',
-          fontStyle: i % 2 === 0 ? 'normal' : 'italic',
-          fontSize: 18, fontWeight: i % 2 === 0 ? 600 : 400,
-          color: 'var(--ink-soft)', opacity: 0.65, transition: 'opacity 0.3s', cursor: 'default'
-        }}
-        onMouseOver={e => e.currentTarget.style.opacity = '1'}
-        onMouseOut={e => e.currentTarget.style.opacity = '0.65'}>
-          {l}
-        </span>
-      ))}
-    </div>
-  );
-};
-
-// ─── Nav ──────────────────────────────────────────────────────
-const Nav = () => {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  return (
-    <header style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-      padding: scrolled ? '14px 0' : '24px 0',
-      background: scrolled ? 'rgba(244,238,227,0.78)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(14px) saturate(140%)' : 'none',
-      WebkitBackdropFilter: scrolled ? 'blur(14px) saturate(140%)' : 'none',
-      borderBottom: scrolled ? '1px solid var(--hairline-soft)' : '1px solid transparent',
-      transition: 'all 0.4s var(--ease)'
-    }}>
-      <Container style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <a href="#" style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' }}>
-          <Logo /><span>PixxelNest</span>
-        </a>
-        <nav style={{ display: 'flex', gap: 32, alignItems: 'center' }} className="nav-links">
-          {['Services','Work','Process','Pricing','FAQ'].map(l => (
-            <a key={l} href={`#${l.toLowerCase()}`} style={{ fontSize: 14, color: 'var(--ink-soft)', fontWeight: 500, transition: 'color 0.2s' }}
-              onMouseOver={e => e.currentTarget.style.color = 'var(--accent)'}
-              onMouseOut={e => e.currentTarget.style.color = 'var(--ink-soft)'}>{l}</a>
-          ))}
-        </nav>
-        <MagneticButton primary href="book.html">Book a call <IconArrow /></MagneticButton>
-      </Container>
-      <style>{`@media (max-width: 860px) { .nav-links { display: none !important; } }`}</style>
-    </header>
-  );
-};
-
-// ─── Hero ─────────────────────────────────────────────────────
-const Hero = () => {
-  const revealRef = useReveal();
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  return (
-    <section ref={revealRef} style={{ paddingTop: 160, paddingBottom: 80, position: 'relative', overflow: 'hidden' }}>
-      <Container>
-        <div className="reveal" style={{
-          display: 'inline-flex', alignItems: 'center', gap: 10,
-          padding: '8px 14px 8px 10px', borderRadius: 999,
-          background: 'var(--card)', border: '1px solid var(--hairline)',
-          fontSize: 13, fontWeight: 500, color: 'var(--ink-soft)', marginBottom: 36
-        }}>
-          <span style={{ position: 'relative', display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#3ABE7A' }}>
-            <span style={{ position: 'absolute', inset: -3, borderRadius: '50%', background: 'rgba(58,190,122,0.35)', animation: 'pulse 2s ease-out infinite' }} />
-          </span>
-          Taking 2 new projects in July. Booking August now.
-        </div>
-
-        <h1 className="reveal reveal-delay-1" style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(56px, 9vw, 144px)', lineHeight: 0.92, letterSpacing: '-0.045em',
-          fontWeight: 500, color: 'var(--ink)', maxWidth: '14ch', marginBottom: 32
-        }}>
-          A studio for <br />
-          <RotatingWord words={['the details','the outliers','the quiet wins','the long game']} />
-        </h1>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'end', gap: 48, marginBottom: 72 }} className="hero-foot">
-          <p className="reveal reveal-delay-2" style={{ fontSize: 'clamp(18px, 1.6vw, 22px)', lineHeight: 1.45, color: 'var(--ink-soft)', maxWidth: '46ch', fontWeight: 400 }}>
-            We are a small studio that builds brands, websites, and ad campaigns that actually work. No drama, no fluff, just good work.
-          </p>
-          <div className="reveal reveal-delay-3" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <MagneticButton primary href="book.html">Book a call <IconArrow /></MagneticButton>
-            <MagneticButton href="work.html">See our work</MagneticButton>
-          </div>
-        </div>
-
-        <div className="reveal reveal-delay-4" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 16, height: 'clamp(220px, 30vw, 360px)' }} id="hero-tiles">
-          <div style={{
-            borderRadius: 'var(--radius-lg)',
-            background: 'linear-gradient(135deg, #E55A3C 0%, #F2A07E 100%)',
-            position: 'relative', overflow: 'hidden',
-            transform: `translateY(${scrollY * -0.08}px)`, willChange: 'transform'
-          }}>
-            <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), transparent 50%)' }} />
-            <div style={{ position: 'absolute', top: 24, left: 28, color: '#FFF7F0', fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500, opacity: 0.85 }}>Currently</div>
-            <div style={{ position: 'absolute', bottom: 28, left: 28, right: 28, fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontSize: 'clamp(28px, 3.4vw, 48px)', color: '#FFF7F0', lineHeight: 1.05, fontWeight: 400 }}>
-              Crafting a brand <br /> for a Lisbon café.
-            </div>
-            <div style={{ position: 'absolute', top: -60, right: -60, width: 220, height: 220, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.25)' }} />
-            <div style={{ position: 'absolute', top: -100, right: -100, width: 320, height: 320, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.15)' }} />
-          </div>
-          <div style={{
-            borderRadius: 'var(--radius-lg)', background: 'var(--ink)', color: 'var(--bg)',
-            padding: 28, display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-            transform: `translateY(${scrollY * -0.04}px)`, willChange: 'transform'
-          }}>
-            <div style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.6 }}>Est. 2021</div>
-            <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5vw, 72px)', lineHeight: 0.95, letterSpacing: '-0.04em', fontWeight: 500 }}>
-                120<span style={{ color: 'var(--accent-soft)' }}>+</span>
-              </div>
-              <div style={{ fontSize: 14, opacity: 0.7, marginTop: 8 }}>Brands shipped<br />since day one.</div>
-            </div>
-          </div>
-          <div style={{
-            borderRadius: 'var(--radius-lg)', background: 'var(--card-highlight)',
-            position: 'relative', overflow: 'hidden',
-            transform: `translateY(${scrollY * -0.06}px)`, willChange: 'transform'
-          }}>
-            <ImgSlot placeholder="Drop a studio shot" style={{ position: 'absolute', inset: 0, borderRadius: 'var(--radius-lg)' }} />
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20,
-              background: 'linear-gradient(to top, rgba(28,24,20,0.7), transparent)',
-              color: '#FFF7F0', fontSize: 13, fontWeight: 500,
-              display: 'flex', justifyContent: 'space-between'
-            }}>
-              <span>The studio</span><span style={{ opacity: 0.7 }}>Brooklyn, NY</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="reveal reveal-delay-5" style={{ marginTop: 64 }}>
-          <TrustedBy />
-        </div>
-      </Container>
-      <style>{`
-        @keyframes pulse { 0% { transform: scale(0.6); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
-        @media (max-width: 820px) { .hero-foot { grid-template-columns: 1fr !important; align-items: start !important; } }
-        @media (max-width: 720px) { #hero-tiles { grid-template-columns: 1fr !important; height: auto !important; } #hero-tiles > div { height: 220px; } }
-      `}</style>
-    </section>
-  );
-};
-
-// ─── Marquee ──────────────────────────────────────────────────
-const Marquee = () => {
-  const items = ['Landing pages','Brand identity','Social content','Performance ads','SEO strategy','Site care','Landing pages','Brand identity','Social content','Performance ads','SEO strategy','Site care'];
-  return (
-    <div style={{ padding: '40px 0', borderTop: '1px solid var(--hairline)', borderBottom: '1px solid var(--hairline)', overflow: 'hidden', whiteSpace: 'nowrap', background: 'var(--bg-soft)' }}>
-      <div style={{ display: 'inline-flex', gap: 56, animation: 'marquee 40s linear infinite', fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 3.5vw, 48px)', fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
-        {items.map((t, i) => (
-          <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 56 }}>
-            {t}
-            <span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', background: i % 2 === 0 ? 'var(--accent)' : 'var(--ink)', opacity: i % 2 === 0 ? 1 : 0.85 }} />
-          </span>
-        ))}
-      </div>
-      <style>{`@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
-    </div>
-  );
-};
-
-// ─── Services ─────────────────────────────────────────────────
-const servicesData = [
-  { slug: 'landing-pages',      title: 'Landing Pages',        subtitle: 'Built to get clicks, not just look nice.',  body: 'Design, copy, and build done in one quick sprint. A page that looks great and turns visitors into buyers.',         icon: <IconGlobe /> },
-  { slug: 'brand-in-a-week',    title: 'Brand-in-a-Week',      subtitle: 'A full new look in seven days.',             body: 'Logo, brand guide, and ready-to-post social templates. All set before your next Monday.',                        icon: <IconPalette /> },
-  { slug: 'monthly-social-pack',title: 'Monthly Social Pack',   subtitle: 'Your feed, fully handled.',                 body: '20 posts, 8 reels, and captions that sound like you on your best day. New batch every month.',                   icon: <IconImage /> },
-  { slug: 'ads-management',     title: 'Ads Management',        subtitle: 'Ad spend that pays for itself.',            body: 'We set up, write, and tune your ads each month. We treat your budget like it is our own.',                       icon: <IconChart /> },
-  { slug: 'seo-starter',        title: 'SEO Starter',           subtitle: 'Show up for the searches that matter.',     body: 'Keyword plan, on-page fixes, and the tech work that helps your site climb the rankings.',                        icon: <IconSearch /> },
-  { slug: 'website-care-plan',  title: 'Website Care Plan',     subtitle: 'Build it once, we keep it healthy.',        body: 'Hosting, updates, backups, and small edits. Your site stays fast, safe, and fresh as you grow.',                  icon: <IconShield /> },
-];
-
-const ServiceCard = ({ s, highlighted, idx }) => {
-  const [hover, setHover] = useState(false);
-  return (
-    <div onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} style={{
-      background: highlighted ? 'var(--card-highlight)' : 'var(--card)',
-      borderRadius: 'var(--radius-lg)', padding: 'clamp(28px, 3vw, 40px)',
-      border: '1px solid var(--hairline-soft)', position: 'relative', overflow: 'hidden',
-      transition: 'transform 0.4s var(--ease), box-shadow 0.4s var(--ease)',
-      transform: hover ? 'translateY(-4px)' : 'translateY(0)',
-      boxShadow: hover ? '0 24px 48px -24px rgba(28,24,20,0.15)' : '0 0 0 transparent',
-      cursor: 'pointer', minHeight: 280, display: 'flex', flexDirection: 'column'
-    }}>
-      <div style={{ marginBottom: 36, color: 'var(--ink)' }}>{s.icon}</div>
-      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(24px, 2.1vw, 30px)', fontWeight: 600, letterSpacing: '-0.025em', color: 'var(--ink)', marginBottom: 8, lineHeight: 1.1 }}>{s.title}</h3>
-      <div style={{ color: 'var(--accent)', fontSize: 14, fontWeight: 500, marginBottom: 18 }}>{s.subtitle}</div>
-      <p style={{ color: 'var(--ink-soft)', fontSize: 15, lineHeight: 1.55, marginBottom: 28, flex: 1, opacity: 0.85 }}>{s.body}</p>
-      <a href={`service.html?id=${s.slug}`} style={{
-        display: 'inline-flex', alignItems: 'center', gap: hover ? 14 : 8,
-        fontSize: 14, fontWeight: 500,
-        color: highlighted ? 'var(--accent)' : 'var(--ink)', alignSelf: 'flex-start',
-        transition: 'gap 0.3s var(--ease)'
-      }}>Learn more <IconArrow /></a>
-      <div style={{ position: 'absolute', top: 28, right: 32, fontFamily: 'var(--font-display)', fontSize: 13, color: 'var(--ink)', opacity: 0.3, fontWeight: 500, letterSpacing: '0.05em' }}>0{idx + 1}</div>
-    </div>
-  );
-};
-
-const Services = ({ highlightedIdx = 0 }) => {
-  const revealRef = useReveal();
-  return (
-    <section id="services" ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}>
-      <Container>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, marginBottom: 72, alignItems: 'end' }} className="services-head">
-          <div className="reveal">
-            <Eyebrow>Services</Eyebrow>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5.5vw, 80px)', lineHeight: 0.98, letterSpacing: '-0.04em', fontWeight: 500, marginTop: 20, maxWidth: '14ch' }}>
-              Everything you need.<br />
-              <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontWeight: 400, color: 'var(--accent)' }}>Nothing you don't.</span>
-            </h2>
-          </div>
-          <p className="reveal reveal-delay-1" style={{ fontSize: 17, color: 'var(--ink-soft)', maxWidth: '38ch', lineHeight: 1.55, justifySelf: 'end' }}>
-            Six things we do well, all shaped by years of doing the work. Pick one, or stack a few. We move fast and we don't waste your money.
-          </p>
-        </div>
-        <div className="services-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-          {servicesData.map((s, i) => (
-            <div key={s.title} className={`reveal reveal-delay-${i % 3 + 1}`}>
-              <ServiceCard s={s} idx={i} highlighted={i === highlightedIdx} />
-            </div>
-          ))}
-        </div>
-      </Container>
-      <style>{`
-        @media (max-width: 980px) { .services-grid { grid-template-columns: repeat(2, 1fr) !important; } .services-head { grid-template-columns: 1fr !important; } .services-head p { justify-self: start !important; } }
-        @media (max-width: 640px) { .services-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
-    </section>
-  );
-};
-
-// ─── Manifesto ────────────────────────────────────────────────
-const beliefs = [
-  { n: '01', t: 'Craft over volume.', d: 'We take two projects a month. Each one gets all of us.' },
-  { n: '02', t: 'Strategy lives in the work.', d: 'Not in a 40-slide deck nobody reads twice.' },
-  { n: '03', t: 'Direct, always.', d: 'You talk to the people doing the work. No account managers in the middle.' },
-  { n: '04', t: 'Beautiful does the work.', d: 'Good taste is a real advantage. We mean it.' },
-];
-
-const ManifestoLine = ({ b, delay }) => {
-  const [hover, setHover] = useState(false);
-  return (
-    <div className={`reveal reveal-delay-${Math.min(delay + 1, 5)}`} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} style={{
-      borderTop: '1px solid var(--hairline)', padding: 'clamp(36px, 5vw, 72px) 0',
-      display: 'grid', gridTemplateColumns: '80px 1fr 1.2fr', gap: 'clamp(20px, 4vw, 64px)', alignItems: 'baseline',
-      transition: 'background 0.4s var(--ease)', background: hover ? 'var(--card)' : 'transparent',
-      margin: '0 calc(var(--container-px) * -1)', paddingLeft: 'var(--container-px)', paddingRight: 'var(--container-px)'
-    }}>
-      <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, color: 'var(--accent)', fontWeight: 500, letterSpacing: '0.05em' }}>{b.n}</div>
-      <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 5vw, 72px)', fontWeight: 500, letterSpacing: '-0.035em', color: 'var(--ink)', lineHeight: 1.0, transform: hover ? 'translateX(8px)' : 'translateX(0)', transition: 'transform 0.5s var(--ease)' }}>{b.t}</h3>
-      <p style={{ fontSize: 'clamp(16px, 1.4vw, 19px)', color: 'var(--ink-soft)', lineHeight: 1.5, maxWidth: '32ch', opacity: 0.85 }}>{b.d}</p>
-    </div>
-  );
-};
-
-const Manifesto = () => {
-  const revealRef = useReveal();
-  return (
-    <section ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)', position: 'relative', overflow: 'hidden' }}>
-      <Container>
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: 96 }}>
-          <Eyebrow>What we believe</Eyebrow>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5.5vw, 80px)', lineHeight: 0.98, letterSpacing: '-0.04em', fontWeight: 500, marginTop: 20, maxWidth: '20ch', marginLeft: 'auto', marginRight: 'auto' }}>
-            Four things we'd <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--accent)', fontWeight: 400 }}>tattoo on</span> the studio wall.
-          </h2>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {beliefs.map((b, i) => <ManifestoLine key={b.n} b={b} delay={i} />)}
-        </div>
-      </Container>
-    </section>
-  );
-};
-
-// ─── Numbers ──────────────────────────────────────────────────
-const Numbers = () => {
-  const revealRef = useReveal();
-  const stats = [{ n: '120+', l: 'Brands shipped' }, { n: '7 days', l: 'Average brand sprint' }, { n: '4.2×', l: 'Average sales lift' }, { n: '98%', l: 'Clients who stay' }];
-  return (
-    <section ref={revealRef} style={{ background: 'var(--ink)', color: 'var(--bg)', paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}>
-      <Container>
-        <div className="reveal" style={{ marginBottom: 64, display: 'flex', justifyContent: 'space-between', alignItems: 'end', flexWrap: 'wrap', gap: 32 }}>
-          <div>
-            <Eyebrow dark>Receipts</Eyebrow>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5vw, 72px)', lineHeight: 0.98, letterSpacing: '-0.04em', fontWeight: 500, marginTop: 20, maxWidth: '18ch' }}>
-              Numbers we're <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--accent-soft)', fontWeight: 400 }}>quietly</span> proud of.
-            </h2>
-          </div>
-          <p style={{ fontSize: 15, opacity: 0.6, maxWidth: '30ch', lineHeight: 1.55 }}>Updated every three months. We would rather show the work than talk about it.</p>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, borderTop: '1px solid rgba(244,238,227,0.15)' }} className="stats-grid">
-          {stats.map((s, i) => (
-            <div key={s.l} className={`reveal reveal-delay-${i + 1}`} style={{ padding: '40px 24px 40px 0', borderRight: i < 3 ? '1px solid rgba(244,238,227,0.15)' : 'none', paddingLeft: i > 0 ? 32 : 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(48px, 6vw, 88px)', fontWeight: 500, letterSpacing: '-0.04em', lineHeight: 0.95, marginBottom: 16 }}>{s.n}</div>
-              <div style={{ fontSize: 14, opacity: 0.65 }}>{s.l}</div>
-            </div>
-          ))}
-        </div>
-      </Container>
-      <style>{`
-        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr) !important; } .stats-grid > div:nth-child(2) { border-right: none !important; } .stats-grid > div:nth-child(3), .stats-grid > div:nth-child(4) { border-top: 1px solid rgba(244,238,227,0.15); } }
-      `}</style>
-    </section>
-  );
-};
-
-// ─── Process ──────────────────────────────────────────────────
-const Process = () => {
-  const revealRef = useReveal();
-  const steps = [
-    { n: '01', t: 'Listen', d: 'A real call. We learn what you sell, who you sell to, and what is hurting.' },
-    { n: '02', t: 'Shape',  d: 'A short plan: the look, the structure, and the few choices we feel strongly about.' },
-    { n: '03', t: 'Make',   d: 'We design and build in short, focused bursts. You see real work, not slides.' },
-    { n: '04', t: 'Ship',   d: 'Launch, watch the numbers, fix what does not work. We stay until the numbers move.' },
-  ];
-  return (
-    <section id="process" ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}>
-      <Container>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, borderTop: '1px solid var(--hairline)' }} className="process-grid">
-          {steps.map((s, i) => (
-            <div key={s.n} className={`reveal reveal-delay-${i + 1}`} style={{ padding: '40px 24px 0 0', borderRight: i < 3 ? '1px solid var(--hairline)' : 'none', paddingLeft: i > 0 ? 32 : 0 }}>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 14, color: 'var(--accent)', fontWeight: 500, marginBottom: 20, letterSpacing: '0.02em' }}>{s.n}</div>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 2.6vw, 40px)', fontWeight: 500, letterSpacing: '-0.03em', marginBottom: 16, lineHeight: 1 }}>{s.t}</h3>
-              <p style={{ fontSize: 15, color: 'var(--ink-soft)', lineHeight: 1.55, opacity: 0.85 }}>{s.d}</p>
-            </div>
-          ))}
-        </div>
-      </Container>
-      <style>{`
-        @media (max-width: 900px) { .process-grid { grid-template-columns: repeat(2, 1fr) !important; } .process-grid > div:nth-child(2) { border-right: none !important; } .process-grid > div:nth-child(3), .process-grid > div:nth-child(4) { padding-top: 40px !important; border-top: 1px solid var(--hairline); margin-top: 32px; } }
-        @media (max-width: 540px) { .process-grid { grid-template-columns: 1fr !important; } .process-grid > div { border-right: none !important; padding-left: 0 !important; } .process-grid > div + div { border-top: 1px solid var(--hairline); margin-top: 0; padding-top: 40px !important; } }
-      `}</style>
-    </section>
-  );
-};
-
-// ─── Testimonials ─────────────────────────────────────────────
-const quotes = [
-  { q: 'They shipped our whole brand in seven days. Seven. Nothing felt rushed, nothing felt off.', a: 'Maya Okafor', r: 'Founder, Foreland Coffee', t: 'Brand sprint, 7 days' },
-  { q: 'The first agency we have worked with that actually cared about our sales numbers, not their next case study.', a: 'Daniel Reeves', r: 'CEO, Northbound Outdoor', t: 'Landing + Ads, 6 weeks' },
-  { q: 'Our feed went from a boring task to our favorite part of the week. They write in our voice better than we do.', a: 'Camille Bertrand', r: 'Creative Director, Maison Vie', t: 'Social retainer, 12 months' },
-  { q: 'I have hired four studios in my career. PixxelNest is the only one I have hired back three times.', a: 'James Hwang', r: 'COO, Halcyon Health', t: 'Multi-project partner' },
-];
-
-const Testimonials = () => {
-  const revealRef = useReveal();
-  return (
-    <section ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)', background: 'var(--bg-soft)', borderTop: '1px solid var(--hairline-soft)', borderBottom: '1px solid var(--hairline-soft)', overflow: 'hidden' }}>
-      <Container>
-        <div className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginBottom: 56, flexWrap: 'wrap', gap: 24 }}>
-          <div>
-            <Eyebrow>Kind words</Eyebrow>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5.5vw, 76px)', lineHeight: 0.98, letterSpacing: '-0.04em', fontWeight: 500, marginTop: 20, maxWidth: '14ch' }}>
-              From people <br />who'd know.
-            </h2>
-          </div>
-          <div style={{ fontSize: 14, color: 'var(--muted)', maxWidth: '32ch', lineHeight: 1.55 }}>Pulled from kickoff emails, Slack messages, and the odd 11pm voice note.</div>
-        </div>
-      </Container>
-      <div className="reveal reveal-delay-1" style={{ display: 'flex', gap: 20, overflowX: 'auto', scrollSnapType: 'x mandatory', padding: '8px clamp(20px, 4vw, 56px) 32px', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-        {quotes.map((qq, i) => (
-          <article key={i} style={{ flex: '0 0 clamp(320px, 42vw, 560px)', scrollSnapAlign: 'start', background: 'var(--card)', border: '1px solid var(--hairline-soft)', borderRadius: 'var(--radius-lg)', padding: 'clamp(28px, 3vw, 44px)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: 360 }}>
-            <div>
-              <div style={{ fontFamily: 'var(--font-serif)', fontSize: 88, lineHeight: 0.5, color: 'var(--accent)', marginBottom: 8, fontStyle: 'italic' }}>"</div>
-              <blockquote style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 1.7vw, 26px)', lineHeight: 1.3, letterSpacing: '-0.02em', fontWeight: 500, color: 'var(--ink)', margin: 0 }}>{qq.q}</blockquote>
-            </div>
-            <footer style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid var(--hairline)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16 }}>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>{qq.a}</div>
-                <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 2 }}>{qq.r}</div>
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--accent)', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 500, textAlign: 'right', maxWidth: 120 }}>{qq.t}</div>
-            </footer>
-          </article>
-        ))}
-        <div style={{ flex: '0 0 clamp(20px, 4vw, 56px)' }} />
-      </div>
-    </section>
-  );
-};
-
-// ─── Case Studies ─────────────────────────────────────────────
-const casesData = [
-  { tag: 'Brand · Web', client: 'Foreland Coffee', desc: "A specialty roaster's rebrand and DTC site that 3.4×'d email signups.", bg: 'linear-gradient(135deg, #D4623F 0%, #8B3A22 100%)', big: true, metrics: [{ n: '3.4×', l: 'Email signups' }, { n: '+62%', l: 'AOV lift' }, { n: '14d', l: 'Sprint' }] },
-  { tag: 'Landing · Ads', client: 'Northbound Outdoor', desc: 'A campaign page + ads that cut CAC by 41% across three quarters.', bg: '#1F2A24', metrics: [{ n: '-41%', l: 'CAC' }, { n: '2.8×', l: 'CTR' }] },
-  { tag: 'Social', client: 'Maison Vie', desc: '12 months of editorial-grade Instagram for a Paris-based atelier.', bg: '#EFE6D6', metrics: [{ n: '4.1×', l: 'Followers' }, { n: '12mo', l: 'Retainer' }] },
-];
-
-const CaseCard = ({ c, big }) => {
-  const [hover, setHover] = useState(false);
-  return (
-    <a href="#" onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} style={{
-      display: 'block', borderRadius: 'var(--radius-lg)', overflow: 'hidden', position: 'relative',
-      background: c.bg, width: '100%', height: '100%', cursor: 'pointer',
-      transition: 'transform 0.5s var(--ease)', transform: hover ? 'translateY(-4px)' : 'translateY(0)',
-      minHeight: big ? 540 : 262
-    }}>
-      <ImgSlot placeholder="Drop case study image" style={{ position: 'absolute', inset: 0, borderRadius: 0, background: 'transparent' }} />
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.05) 50%, transparent 100%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', top: 24, left: 28 }}>
-        <span style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', borderRadius: 999, fontSize: 11, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#FFF7F0', border: '1px solid rgba(255,255,255,0.2)' }}>{c.tag}</span>
-      </div>
-      <div style={{ position: 'absolute', bottom: 28, left: 28, right: 28, color: '#FFF7F0' }}>
-        <div style={{ fontFamily: 'var(--font-display)', fontSize: big ? 'clamp(28px, 3vw, 42px)' : 'clamp(22px, 2vw, 28px)', fontWeight: 500, letterSpacing: '-0.025em', marginBottom: 10, lineHeight: 1.05 }}>{c.client}</div>
-        <div style={{ fontSize: 14, opacity: 0.85, lineHeight: 1.45, maxWidth: '42ch' }}>{c.desc}</div>
-        <div style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: hover ? 14 : 8, fontSize: 13, fontWeight: 500, transition: 'gap 0.3s var(--ease)' }}>View case <IconArrow /></div>
-      </div>
-      <div style={{ position: 'absolute', top: 64, right: 28, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-end', pointerEvents: 'none' }}>
-        {(c.metrics || []).map((m, i) => (
-          <div key={i} style={{ padding: '10px 16px', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 12, color: '#FFF7F0', opacity: hover ? 1 : 0, transform: hover ? 'translateX(0)' : 'translateX(20px)', transition: `opacity 0.45s var(--ease) ${i * 0.06}s, transform 0.45s var(--ease) ${i * 0.06}s`, minWidth: 110, textAlign: 'right' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: big ? 24 : 20, fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1 }}>{m.n}</div>
-            <div style={{ fontSize: 10, opacity: 0.7, marginTop: 4, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 500 }}>{m.l}</div>
-          </div>
-        ))}
-      </div>
-    </a>
-  );
-};
-
-const CaseStudies = () => {
-  const revealRef = useReveal();
-  return (
-    <section id="work" ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}>
-      <Container>
-        <div className="reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'end', marginBottom: 56, flexWrap: 'wrap', gap: 24 }}>
-          <div>
-            <Eyebrow>Selected work</Eyebrow>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5.5vw, 80px)', lineHeight: 0.98, letterSpacing: '-0.04em', fontWeight: 500, marginTop: 20, maxWidth: '16ch' }}>
-              The work, <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--accent)', fontWeight: 400 }}>not the talk</span>.
-            </h2>
-          </div>
-          <MagneticButton href="#">See full archive <IconArrow /></MagneticButton>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, alignItems: 'stretch' }} className="cases-grid">
-          <div className="reveal reveal-delay-1 case-cell"><CaseCard c={casesData[0]} big /></div>
-          <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 16 }} className="cases-stack">
-            <div className="reveal reveal-delay-2 case-cell"><CaseCard c={casesData[1]} /></div>
-            <div className="reveal reveal-delay-3 case-cell"><CaseCard c={casesData[2]} /></div>
-          </div>
-        </div>
-      </Container>
-      <style>{`
-        .case-cell { display: flex; height: 100%; min-height: 0; } .case-cell > a { flex: 1; }
-        @media (max-width: 900px) { .cases-grid { grid-template-columns: 1fr !important; } .case-cell > a { min-height: 360px !important; } }
-      `}</style>
-    </section>
-  );
-};
-
-// ─── Press Strip ──────────────────────────────────────────────
-const PressStrip = () => {
-  const items = [{ tag: 'Awwwards', label: 'Site of the Day, 3x' }, { tag: 'Brand New', label: 'Featured rebrand, 2024' }, { tag: "It's Nice That", label: 'Studio of the Week' }, { tag: 'CSS Design', label: 'Best Studio Site, 2025' }];
-  return (
-    <div style={{ padding: '32px 0', borderTop: '1px solid var(--hairline)', borderBottom: '1px solid var(--hairline)', background: 'var(--bg)' }}>
-      <Container>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }} className="press-grid">
-          {items.map((it, i) => (
-            <div key={it.tag} style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: i > 0 ? 24 : 0, borderLeft: i > 0 ? '1px solid var(--hairline)' : 'none' }}>
-              <div style={{ fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--accent)', fontWeight: 600 }}>{it.tag}</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 500, color: 'var(--ink)', letterSpacing: '-0.01em' }}>{it.label}</div>
-            </div>
-          ))}
-        </div>
-      </Container>
-      <style>{`@media (max-width: 720px) { .press-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; } .press-grid > div { padding-left: 0 !important; border-left: none !important; } }`}</style>
-    </div>
-  );
-};
-
-// ─── Pricing ──────────────────────────────────────────────────
-// NOTE: Sprint price changed from '2,49,000' to '49,999' per design spec
-const tiers = [
-  { name: 'Sprint',  price: '49,999',    unit: 'one-time', desc: 'A short, focused project to ship one thing fast.',         features: ['One landing page or brand sprint','7 days, start to ship','One round of revisions','Direct Slack channel'],              highlighted: false },
-  { name: 'Studio',  price: '5,49,000',  unit: '/month',   desc: 'A monthly plan for brands that need ongoing work.',         features: ['Anything in the services menu','Up to 80 hrs/month, async-first','Weekly check-ins, no standups','Founder + senior designer'], highlighted: true, badge: 'Most picked' },
-  { name: 'Custom',  price: "Let's talk",unit: '',          desc: 'For longer projects and full partnerships.',                features: ['Multi-quarter engagement','Dedicated cross-functional team','Quarterly strategy planning','Custom scope, custom rate'],       highlighted: false },
-];
-
-const Pricing = () => {
-  const revealRef = useReveal();
-  return (
-    <section id="pricing" ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)', background: 'var(--bg-soft)', borderTop: '1px solid var(--hairline-soft)', borderBottom: '1px solid var(--hairline-soft)' }}>
-      <Container>
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
-          <Eyebrow>Pricing</Eyebrow>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5.5vw, 80px)', lineHeight: 0.98, letterSpacing: '-0.04em', fontWeight: 500, marginTop: 20, maxWidth: '18ch', marginLeft: 'auto', marginRight: 'auto' }}>
-            Straight rates, no <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--accent)', fontWeight: 400 }}>surprises</span>.
-          </h2>
-        </div>
-        <div id="price" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, alignItems: 'stretch' }} className="pricing-grid">
-          {tiers.map((t, i) => (
-            <div key={t.name} className={`reveal reveal-delay-${i + 1}`} style={{
-              background: t.highlighted ? 'var(--ink)' : 'var(--card)',
-              color: t.highlighted ? 'var(--bg)' : 'var(--ink)',
-              borderRadius: 'var(--radius-lg)', padding: 'clamp(32px, 3vw, 44px)',
-              border: t.highlighted ? '1px solid transparent' : '1px solid var(--hairline-soft)',
-              position: 'relative', display: 'flex', flexDirection: 'column',
-              transform: t.highlighted ? 'scale(1.02)' : 'scale(1)',
-              boxShadow: t.highlighted ? '0 24px 64px -32px rgba(28,24,20,0.45)' : 'none'
-            }}>
-              {t.badge && (
-                <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', padding: '7px 14px', background: 'var(--accent)', color: '#FFF7F0', fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', borderRadius: 999, whiteSpace: 'nowrap' }}>{t.badge}</div>
-              )}
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 600, letterSpacing: '-0.02em', marginBottom: 8 }}>{t.name}</div>
-              <div style={{ fontSize: 14, color: t.highlighted ? 'rgba(244,238,227,0.65)' : 'var(--muted)', marginBottom: 28, lineHeight: 1.5 }}>{t.desc}</div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 36 }}>
-                {t.price !== "Let's talk" && <span style={{ fontSize: 18, opacity: 0.6 }}>₹</span>}
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: t.price === "Let's talk" ? 'clamp(36px, 4vw, 56px)' : 'clamp(48px, 5.5vw, 72px)', fontWeight: 500, letterSpacing: '-0.04em', lineHeight: 1 }}>{t.price}</span>
-                {t.unit && <span style={{ fontSize: 14, opacity: 0.6 }}>{t.unit}</span>}
-              </div>
-              <div style={{ height: 1, background: t.highlighted ? 'rgba(244,238,227,0.15)' : 'var(--hairline)', marginBottom: 24 }} />
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, flex: 1, marginBottom: 32 }}>
-                {t.features.map(f => (
-                  <li key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, fontSize: 14, padding: '10px 0', color: t.highlighted ? 'rgba(244,238,227,0.85)' : 'var(--ink-soft)' }}>
-                    <span style={{ flexShrink: 0, marginTop: 7, width: 6, height: 6, borderRadius: '50%', background: t.highlighted ? 'var(--accent-soft)' : 'var(--accent)' }} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a href="book.html" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 22px', borderRadius: 999, background: t.highlighted ? 'var(--accent)' : 'var(--ink)', color: t.highlighted ? '#FFF7F0' : 'var(--bg)', fontSize: 14, fontWeight: 500, transition: 'transform 0.3s var(--ease)' }}
-                onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
-                {t.price === "Let's talk" ? 'Get in touch' : 'Start a project'} <IconArrow />
-              </a>
-            </div>
-          ))}
-        </div>
-        <div className="reveal reveal-delay-4" style={{ textAlign: 'center', marginTop: 48, fontSize: 14, color: 'var(--muted)' }}>
-          All projects start with a free 30-min call. No deck, no pitch, just a conversation.
-        </div>
-      </Container>
-      <style>{`@media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr !important; max-width: 480px; margin-left: auto; margin-right: auto; } }`}</style>
-    </section>
-  );
-};
-
-// ─── FAQ ──────────────────────────────────────────────────────
-const faqs = [
-  { q: 'How long does a typical project take?', a: 'Sprints ship in 7 to 14 days. Brand-in-a-Week is exactly that. Bigger builds run 4 to 8 weeks. We tell you up front and we hit our dates.' },
-  { q: 'Who actually does the work?', a: 'A founder and a senior designer, on every project. No juniors hidden behind account managers, and no quiet outsourcing.' },
-  { q: 'Do you work with early-stage startups?', a: 'Yes. About half our clients are pre-Series A. We have a soft spot for founders who care about the small things.' },
-  { q: 'What about ongoing edits after launch?', a: 'Our Website Care plan covers that. Or roll it into a Studio plan and we will keep improving the site with you.' },
-  { q: 'Can I see a proposal before I commit?', a: 'Always. The first call is free, the written plan is free, and you only pay once you have read it all and said yes.' },
-];
-
-const FAQItem = ({ q, a, open, onClick }) => (
-  <div style={{ borderBottom: '1px solid var(--hairline)' }}>
-    <button onClick={onClick} style={{ width: '100%', textAlign: 'left', padding: '32px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
-      <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 1.9vw, 26px)', fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--ink)' }}>{q}</span>
-      <span style={{ flexShrink: 0, width: 40, height: 40, borderRadius: '50%', background: open ? 'var(--accent)' : 'transparent', border: `1px solid ${open ? 'var(--accent)' : 'var(--hairline)'}`, color: open ? '#FFF7F0' : 'var(--ink)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.4s var(--ease)', transform: open ? 'rotate(45deg)' : 'rotate(0deg)' }}>
-        <IconPlus />
-      </span>
-    </button>
-    <div style={{ maxHeight: open ? 200 : 0, overflow: 'hidden', transition: 'max-height 0.5s var(--ease)' }}>
-      <p style={{ fontSize: 16, color: 'var(--ink-soft)', lineHeight: 1.6, maxWidth: '62ch', paddingBottom: 32, paddingRight: 64 }}>{a}</p>
-    </div>
-  </div>
-);
-
-const FAQ = () => {
-  const revealRef = useReveal();
-  const [openIdx, setOpenIdx] = useState(0);
-  return (
-    <section id="faq" ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 'var(--section-py)' }}>
-      <Container>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 80, alignItems: 'start' }} className="faq-grid">
-          <div className="reveal" style={{ position: 'sticky', top: 120 }}>
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 5vw, 72px)', lineHeight: 0.98, letterSpacing: '-0.04em', fontWeight: 500, marginTop: 20 }}>
-              Asked & <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'var(--accent)', fontWeight: 400 }}>answered</span>.
-            </h2>
-            <p style={{ marginTop: 28, fontSize: 15, color: 'var(--ink-soft)', lineHeight: 1.6, maxWidth: '32ch' }}>Still wondering? Drop us a line and a human will write you back, usually same day.</p>
-          </div>
-          <div className="reveal reveal-delay-1">
-            {faqs.map((f, i) => (
-              <FAQItem key={i} q={f.q} a={f.a} open={openIdx === i} onClick={() => setOpenIdx(openIdx === i ? -1 : i)} />
-            ))}
-          </div>
-        </div>
-      </Container>
-      <style>{`@media (max-width: 880px) { .faq-grid { grid-template-columns: 1fr !important; gap: 48px !important; } .faq-grid > div:first-child { position: static !important; } }`}</style>
-    </section>
-  );
-};
-
-// ─── Final CTA + Footer ───────────────────────────────────────
-const FinalCTA = () => {
-  const revealRef = useReveal();
-  return (
-    <section id="contact" ref={revealRef} style={{ paddingTop: 'var(--section-py)', paddingBottom: 80, background: 'var(--ink)', color: 'var(--bg)', position: 'relative', overflow: 'hidden' }}>
-      <Container>
-        <div className="reveal" style={{ textAlign: 'center' }}>
-          <Eyebrow dark>Let's begin</Eyebrow>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(64px, 12vw, 200px)', lineHeight: 0.88, letterSpacing: '-0.05em', fontWeight: 500, margin: '32px 0 48px' }}>
-            Let's work <br />
-            <span style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontWeight: 400, color: 'var(--accent-soft)', letterSpacing: '-0.03em' }}>together.</span>
-          </h2>
-          <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
-            <a href="mailto:hello@pixxelnest.studio" style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(20px, 2.2vw, 30px)', fontWeight: 500, letterSpacing: '-0.02em', padding: '18px 40px', borderRadius: 999, border: '1px solid rgba(244,238,227,0.25)', transition: 'all 0.4s var(--ease)', display: 'inline-flex', alignItems: 'center', gap: 16, background: 'transparent', color: 'var(--bg)' }}
-              onMouseOver={e => { e.currentTarget.style.background = 'var(--accent)'; e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = '#FFF7F0'; }}
-              onMouseOut={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'rgba(244,238,227,0.25)'; e.currentTarget.style.color = 'var(--bg)'; }}>
-              hello@pixxelnest.studio <IconArrow size={18} />
-            </a>
-            <div style={{ fontSize: 14, opacity: 0.5 }}>Or book a 30-minute intro call directly.</div>
-          </div>
-        </div>
-      </Container>
-      <Container style={{ marginTop: 160, paddingTop: 40, borderTop: '1px solid rgba(244,238,227,0.15)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr 1fr', gap: 48 }} className="footer-grid">
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em', marginBottom: 16 }}><Logo /><span>PixxelNest</span></div>
-            <p style={{ fontSize: 14, opacity: 0.55, maxWidth: '32ch', lineHeight: 1.5 }}>A small studio building brands and websites with care. Brooklyn, NY. Working worldwide.</p>
-          </div>
-          <div>
-            <div style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.5, marginBottom: 16 }}>Studio</div>
-            {['Services','Work','Process','Pricing'].map(l => (
-              <a key={l} href={`#${l.toLowerCase()}`} style={{ display: 'block', fontSize: 14, padding: '6px 0', opacity: 0.8 }}>{l}</a>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.5, marginBottom: 16 }}>Follow</div>
-            {['Instagram','LinkedIn','Dribbble','Are.na'].map(l => (
-              <a key={l} href="#" style={{ display: 'block', fontSize: 14, padding: '6px 0', opacity: 0.8 }}>{l} <span style={{ opacity: 0.4 }}>↗</span></a>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontSize: 12, letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.5, marginBottom: 16 }}>Contact</div>
-            <a href="mailto:hello@pixxelnest.studio" style={{ display: 'block', fontSize: 14, padding: '6px 0', opacity: 0.8 }}>hello@pixxelnest.studio</a>
-            <div style={{ fontSize: 14, padding: '6px 0', opacity: 0.55 }}>241 Wythe Ave, BK</div>
-            <div style={{ fontSize: 14, padding: '6px 0', opacity: 0.55 }}>Mon-Fri, 9 to 6 ET</div>
-          </div>
-        </div>
-        <div style={{ marginTop: 64, paddingTop: 32, borderTop: '1px solid rgba(244,238,227,0.1)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, fontSize: 13, opacity: 0.45 }}>
-          <span>© 2026 PixxelNest Studio. All rights reserved.</span>
-          <span>Made slowly, on purpose, in Brooklyn.</span>
-        </div>
-      </Container>
-      <style>{`
-        @media (max-width: 820px) { .footer-grid { grid-template-columns: 1fr 1fr !important; } }
-        @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr !important; } }
-      `}</style>
-    </section>
-  );
-};
-
-// ─── Now Widget ───────────────────────────────────────────────
-const NowWidget = () => {
-  const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { const id = setTimeout(() => setMounted(true), 2000); return () => clearTimeout(id); }, []);
-  return (
-    <div style={{ position: 'fixed', bottom: 24, left: 24, zIndex: 60, transform: mounted ? 'translateY(0)' : 'translateY(20px)', opacity: mounted ? 1 : 0, transition: 'all 0.6s var(--ease)' }} className="now-widget">
-      <button onClick={() => setOpen(!open)} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px 10px 12px', background: 'var(--ink)', color: 'var(--bg)', borderRadius: 999, fontSize: 13, fontWeight: 500, boxShadow: '0 12px 32px -12px rgba(28,24,20,0.4)', border: '1px solid rgba(244,238,227,0.08)' }}>
-        <span style={{ position: 'relative', display: 'inline-block', width: 8, height: 8 }}>
-          <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#3ABE7A' }} />
-          <span style={{ position: 'absolute', inset: -4, borderRadius: '50%', background: 'rgba(58,190,122,0.3)', animation: 'pulse 2s ease-out infinite' }} />
-        </span>
-        Now: shipping a coffee brand
-        <span style={{ opacity: 0.5, marginLeft: 4, transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>⌃</span>
-      </button>
-      {open && (
-        <div style={{ position: 'absolute', bottom: 'calc(100% + 8px)', left: 0, width: 280, padding: 20, background: 'var(--ink)', color: 'var(--bg)', borderRadius: 16, fontSize: 13, lineHeight: 1.5, boxShadow: '0 24px 48px -16px rgba(28,24,20,0.4)', border: '1px solid rgba(244,238,227,0.08)' }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', opacity: 0.55, marginBottom: 12, fontWeight: 500 }}>This week at the studio</div>
-          {['Foreland Coffee, site final review','Maison Vie, Q3 social drop','Northbound, ad creative round 2'].map((item, i) => (
-            <div key={i} style={{ display: 'flex', gap: 8, padding: '6px 0' }}>
-              <span style={{ color: 'var(--accent-soft)' }}>○</span>
-              <span style={{ opacity: 0.85 }}>{item}</span>
-            </div>
-          ))}
-          <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(244,238,227,0.1)', fontSize: 12, opacity: 0.5 }}>Updated Mon, 9:42am ET</div>
-        </div>
-      )}
-      <style>{`@media (max-width: 720px) { .now-widget { display: none; } }`}</style>
-    </div>
-  );
-};
-
-// ─── Custom Cursor ────────────────────────────────────────────
-const CustomCursor = () => {
-  const dotRef = useRef(null);
-  const ringRef = useRef(null);
-  useEffect(() => {
-    if (window.matchMedia('(pointer: coarse)').matches) return;
-    let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0, rafId;
-    const onMove = (e) => {
-      mouseX = e.clientX; mouseY = e.clientY;
-      if (dotRef.current) dotRef.current.style.transform = `translate3d(${mouseX - 3}px, ${mouseY - 3}px, 0)`;
-    };
-    const tick = () => {
-      ringX += (mouseX - ringX) * 0.18; ringY += (mouseY - ringY) * 0.18;
-      if (ringRef.current) ringRef.current.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0)`;
-      rafId = requestAnimationFrame(tick);
-    };
-    tick();
-    const onOver = (e) => {
-      const t = e.target.closest('a, button, [data-cursor]');
-      if (ringRef.current) {
-        if (t) { ringRef.current.style.width = '52px'; ringRef.current.style.height = '52px'; ringRef.current.style.marginLeft = '-10px'; ringRef.current.style.marginTop = '-10px'; ringRef.current.style.borderColor = 'var(--accent)'; ringRef.current.style.background = 'rgba(229,90,60,0.06)'; }
-        else { ringRef.current.style.width = '32px'; ringRef.current.style.height = '32px'; ringRef.current.style.marginLeft = '0'; ringRef.current.style.marginTop = '0'; ringRef.current.style.borderColor = 'var(--ink)'; ringRef.current.style.background = 'transparent'; }
-      }
-    };
-    window.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseover', onOver);
-    return () => { cancelAnimationFrame(rafId); window.removeEventListener('mousemove', onMove); document.removeEventListener('mouseover', onOver); };
-  }, []);
-  return (
-    <>
-      <style>{`@media (pointer: fine) { body { cursor: none; } a, button, [data-cursor] { cursor: none !important; } } @media (pointer: coarse) { .custom-cursor { display: none !important; } }`}</style>
-      <div ref={dotRef} className="custom-cursor" style={{ position: 'fixed', top: 0, left: 0, width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', pointerEvents: 'none', zIndex: 9999, willChange: 'transform' }} />
-      <div ref={ringRef} className="custom-cursor" style={{ position: 'fixed', top: 0, left: 0, width: 32, height: 32, borderRadius: '50%', border: '1.5px solid var(--ink)', pointerEvents: 'none', zIndex: 9998, willChange: 'transform, width, height', transition: 'width 0.3s var(--ease), height 0.3s var(--ease), border-color 0.3s, background 0.3s, margin 0.3s var(--ease)', mixBlendMode: 'difference', opacity: 0.55 }} />
-    </>
-  );
-};
-
-// ─── App ──────────────────────────────────────────────────────
-function App() {
-  return (
-    <>
-      <CustomCursor />
-      <Nav />
-      <Hero />
-      <Marquee />
-      <Services highlightedIdx={0} />
-      <Manifesto />
-      <Numbers />
-      <Process />
-      <Testimonials />
-      <CaseStudies />
-      <PressStrip />
-      <Pricing />
-      <FAQ />
-      <FinalCTA />
-      <NowWidget />
-    </>
-  );
+:root {
+  --bg: #F4EEE3;
+  --bg-soft: #EFE6D6;
+  --card: #FAF5EA;
+  --card-highlight: #F2DFC4;
+  --ink: #1C1814;
+  --ink-soft: #3A332C;
+  --muted: #8A8074;
+  --hairline: rgba(28, 24, 20, 0.10);
+  --hairline-soft: rgba(28, 24, 20, 0.06);
+  --accent: #E55A3C;
+  --accent-soft: #F18F76;
+  --font-display: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --section-py: clamp(80px, 10vw, 140px);
+  --container-px: clamp(20px, 4vw, 56px);
+  --container-max: 1320px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--font-body);font-size:16px;line-height:1.6;
+  font-feature-settings:"ss01","cv11";overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:0.5;mix-blend-mode:multiply;z-index:1;
+}
+#root{position:relative;z-index:2}
+::selection{background:var(--accent);color:var(--bg)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.9s var(--ease),transform 0.9s var(--ease)}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.08s}
+.reveal-delay-2{transition-delay:0.16s}
+.reveal-delay-3{transition-delay:0.24s}
+.reveal-delay-4{transition-delay:0.32s}
+.reveal-delay-5{transition-delay:0.40s}
+@media(prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  html{scroll-behavior:auto}
+}
+
+/* Container */
+.container{max-width:var(--container-max);margin:0 auto;padding-left:var(--container-px);padding-right:var(--container-px);position:relative}
+
+/* Eyebrow */
+.eyebrow{display:inline-flex;align-items:center;gap:10;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;font-weight:500;color:var(--muted)}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.eyebrow.dark{color:rgba(244,238,227,0.65)}
+
+/* Pulse animation */
+@keyframes pulse{0%{transform:scale(0.6);opacity:0.8}100%{transform:scale(1.8);opacity:0}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* === NAV === */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  padding:24px 0;
+  background:transparent;
+  border-bottom:1px solid transparent;
+  transition:all 0.4s var(--ease);
+}
+header.scrolled{
+  padding:14px 0;
+  background:rgba(244,238,227,0.78);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--hairline-soft);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10;font-weight:600;font-size:18px;letter-spacing:-0.02em;font-family:var(--font-display)}
+.nav-links{display:flex;gap:32;align-items:center}
+.nav-links a{font-size:14px;color:var(--ink-soft);font-weight:500;transition:color 0.2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-cta{
+  display:inline-flex;align-items:center;gap:10;
+  padding:15px 24px;border-radius:999px;
+  background:var(--accent);color:#FFF7F0;
+  font-size:14px;font-weight:500;letter-spacing:-0.005em;
+  transition:transform 0.4s var(--ease);
+}
+@media(max-width:860px){.nav-links{display:none!important}}
+
+/* === BUTTONS === */
+.btn{
+  display:inline-flex;align-items:center;gap:10;
+  padding:15px 24px;border-radius:999px;
+  font-size:14px;font-weight:500;letter-spacing:-0.005em;
+  transition:transform 0.4s var(--ease),background 0.3s,color 0.3s;
+  cursor:pointer;
+}
+.btn-primary{background:var(--accent);color:#FFF7F0;border:1px solid transparent}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--hairline)}
+.btn-dark{background:var(--ink);color:var(--bg);border:1px solid transparent}
+.btn:hover{transform:translateY(-2px)}
+
+/* === HERO === */
+.hero{padding-top:160px;padding-bottom:80px;position:relative;overflow:hidden}
+.hero h1{
+  font-family:var(--font-display);font-size:clamp(56px,9vw,144px);
+  line-height:0.92;letter-spacing:-0.045em;font-weight:500;
+  color:var(--ink);max-width:14ch;margin-bottom:32px;
+}
+.hero-rotating-word-container{
+  position:relative;display:inline-block;vertical-align:baseline;white-space:nowrap
+}
+.hero-rotating-word-ghost{visibility:hidden;display:inline-block;font-family:var(--font-serif);font-style:italic;font-weight:400}
+.hero-rotating-word{
+  position:absolute;left:0;top:0;
+  font-family:var(--font-serif);font-style:italic;font-weight:400;color:var(--accent);
+  opacity:0;transform:translateY(0.25em);
+  transition:opacity 0.55s var(--ease),transform 0.55s var(--ease);
+}
+.hero-rotating-word.active{opacity:1;transform:translateY(0)}
+.hero-foot{display:grid;grid-template-columns:1fr auto;align-items:end;gap:48px;margin-bottom:72px}
+@media(max-width:820px){.hero-foot{grid-template-columns:1fr!important;align-items:start!important}}
+
+.hero-tiles{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px;height:clamp(220px,30vw,360px)}
+@media(max-width:720px){.hero-tiles{grid-template-columns:1fr!important;height:auto!important}.hero-tiles>div{height:220px}}
+
+.hero-tile{border-radius:var(--radius-lg);position:relative;overflow:hidden;will-change:transform}
+.hero-tile-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero-tile-overlay{position:absolute;z-index:4}
+
+/* === MARQUEE === */
+.marquee-section{
+  padding:40px 0;
+  border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);
+  overflow:hidden;white-space:nowrap;background:var(--bg-soft);
+}
+.marquee-track{
+  display:inline-flex;gap:56px;
+  animation:marquee 40s linear infinite;
+  font-family:var(--font-display);font-size:clamp(28px,3.5vw,48px);
+  font-weight:500;letter-spacing:-0.02em;color:var(--ink);
+}
+
+/* === SERVICE CARDS === */
+.services-head{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-bottom:72px;align-items:end}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:980px){
+  .services-grid{grid-template-columns:repeat(2,1fr)!important}
+  .services-head{grid-template-columns:1fr!important}
+  .services-head .services-head-right{justify-self:start!important}
+}
+@media(max-width:640px){.services-grid{grid-template-columns:1fr!important}}
+
+.service-card{
+  background:var(--card);border-radius:var(--radius-lg);
+  padding:clamp(28px,3vw,40px);border:1px solid var(--hairline-soft);
+  position:relative;overflow:hidden;cursor:pointer;
+  min-height:280px;display:flex;flex-direction:column;
+  transition:transform 0.4s var(--ease),box-shadow 0.4s var(--ease);
+}
+.service-card:hover{transform:translateY(-4px);box-shadow:0 24px 48px -24px rgba(28,24,20,0.15)}
+.service-card.highlighted{background:var(--card-highlight)}
+.service-card-img-wrap{
+  position:relative;width:100%;aspect-ratio:4/3;
+  border-radius:var(--radius-md);overflow:hidden;
+  margin-bottom:28px;background:var(--bg-soft);
+  transition:transform 0.6s var(--ease);
+}
+.service-card:hover .service-card-img-wrap{transform:scale(1.02)}
+.service-card-img{width:100%;height:100%;object-fit:cover;display:block}
+.service-card h3{
+  font-family:var(--font-display);font-size:clamp(24px,2.1vw,30px);
+  font-weight:600;letter-spacing:-0.025em;color:var(--ink);margin-bottom:8px;line-height:1.1;
+}
+.service-card-subtitle{color:var(--accent);font-size:14px;font-weight:500;margin-bottom:18px;letter-spacing:-0.005em}
+.service-card-body{color:var(--ink-soft);font-size:15px;line-height:1.55;margin-bottom:28px;flex:1;opacity:0.85}
+.service-card-link{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:14px;font-weight:500;color:var(--ink);align-self:flex-start;
+  transition:gap 0.3s var(--ease);
+}
+.service-card:hover .service-card-link{gap:14px}
+.service-card.highlighted .service-card-link{color:var(--accent)}
+
+/* === MANIFESTO === */
+.manifesto-line{
+  border-top:1px solid var(--hairline);
+  padding:clamp(36px,5vw,72px) var(--container-px);
+  display:grid;grid-template-columns:80px 1fr 1.2fr;gap:clamp(20px,4vw,64px);align-items:baseline;
+  position:relative;transition:background 0.4s var(--ease);
+  margin:0 calc(var(--container-px)*-1);
+}
+.manifesto-line:hover{background:var(--card)}
+.manifesto-line:hover .manifesto-title{transform:translateX(8px)}
+.manifesto-title{
+  font-family:var(--font-display);font-size:clamp(36px,5vw,72px);
+  font-weight:500;letter-spacing:-0.035em;color:var(--ink);line-height:1.0;
+  transition:transform 0.5s var(--ease);
+}
+@media(max-width:640px){
+  .manifesto-line{grid-template-columns:60px 1fr!important}
+  .manifesto-line-desc{display:none}
+}
+
+/* === NUMBERS === */
+.numbers-section{background:var(--ink);color:var(--bg);padding-top:var(--section-py);padding-bottom:var(--section-py)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid rgba(244,238,227,0.15)}
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)!important}
+  .stats-grid>div:nth-child(2){border-right:none!important}
+  .stats-grid>div:nth-child(3),.stats-grid>div:nth-child(4){border-top:1px solid rgba(244,238,227,0.15)}
+}
+
+/* === PROCESS === */
+.process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--hairline)}
+@media(max-width:900px){
+  .process-grid{grid-template-columns:repeat(2,1fr)!important}
+  .process-grid>div:nth-child(2){border-right:none!important}
+  .process-grid>div:nth-child(3),.process-grid>div:nth-child(4){padding-top:40px!important;border-top:1px solid var(--hairline);margin-top:32px}
+}
+@media(max-width:540px){
+  .process-grid{grid-template-columns:1fr!important}
+  .process-grid>div{border-right:none!important;padding-left:0!important}
+  .process-grid>div+div{border-top:1px solid var(--hairline);margin-top:0;padding-top:40px!important}
+}
+
+/* === TESTIMONIALS === */
+.quote-scroll{
+  display:flex;gap:20px;overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  padding:8px clamp(20px,4vw,56px) 32px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.quote-scroll::-webkit-scrollbar{display:none}
+.quote-card{
+  flex:0 0 clamp(320px,42vw,560px);scroll-snap-align:start;
+  background:var(--card);border:1px solid var(--hairline-soft);
+  border-radius:var(--radius-lg);padding:clamp(28px,3vw,44px);
+  display:flex;flex-direction:column;justify-content:space-between;min-height:360px;
+}
+
+/* === CASE STUDIES === */
+.cases-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;align-items:stretch}
+.cases-stack{display:grid;grid-template-rows:1fr 1fr;gap:16px}
+.case-cell{display:flex;height:100%;min-height:0}
+@media(max-width:900px){.cases-grid{grid-template-columns:1fr!important}.case-cell>div{min-height:360px!important}}
+
+.case-card{
+  border-radius:var(--radius-lg);overflow:hidden;position:relative;
+  width:100%;height:100%;
+  transition:transform 0.5s var(--ease);
+}
+.case-card:hover{transform:translateY(-4px)}
+.case-card-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.case-card-scrim{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.55) 30%,rgba(0,0,0,0.15) 60%,transparent 100%);
+  pointer-events:none;
+}
+.case-card-tag{
+  position:absolute;top:24px;left:28px;
+  padding:6px 12px;background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-radius:999px;font-size:11px;font-weight:500;
+  letter-spacing:0.1em;text-transform:uppercase;color:#FFF7F0;
+  border:1px solid rgba(255,255,255,0.2);
+}
+.case-card-info{position:absolute;bottom:28px;left:28px;right:28px;color:#FFF7F0}
+.case-card-client{
+  font-family:var(--font-display);font-weight:500;
+  letter-spacing:-0.025em;margin-bottom:10px;line-height:1.05;
+}
+.case-card-desc{font-size:14px;opacity:0.85;line-height:1.45;max-width:42ch}
+.case-card-cta{
+  margin-top:20px;display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:500;color:#FFF7F0;
+  transition:gap 0.3s var(--ease);position:relative;z-index:3;
+}
+.case-card:hover .case-card-cta{gap:14px}
+.case-metrics{
+  position:absolute;top:64px;right:28px;
+  display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:none;
+}
+.case-metric{
+  padding:10px 16px;background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,0.18);border-radius:12px;
+  color:#FFF7F0;opacity:0;transform:translateX(20px);
+  transition:opacity 0.45s var(--ease),transform 0.45s var(--ease);
+  min-width:110px;text-align:right;
+}
+.case-card:hover .case-metric{opacity:1;transform:translateX(0)}
+.case-card:hover .case-metric:nth-child(2){transition-delay:0.06s}
+.case-card:hover .case-metric:nth-child(3){transition-delay:0.12s}
+
+/* === PRESS STRIP === */
+.press-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+@media(max-width:720px){
+  .press-grid{grid-template-columns:1fr 1fr!important;gap:20px!important}
+  .press-grid>div{padding-left:0!important;border-left:none!important}
+}
+
+/* === PRICING === */
+.pricing-section{
+  background:var(--bg-soft);
+  border-top:1px solid var(--hairline-soft);border-bottom:1px solid var(--hairline-soft);
+  padding-top:var(--section-py);padding-bottom:var(--section-py);
+}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+@media(max-width:900px){.pricing-grid{grid-template-columns:1fr!important;max-width:480px;margin-left:auto;margin-right:auto}}
+
+.tier-card{
+  border-radius:var(--radius-lg);padding:clamp(32px,3vw,44px);
+  border:1px solid var(--hairline-soft);
+  position:relative;display:flex;flex-direction:column;
+  background:var(--card);color:var(--ink);
+}
+.tier-card.highlighted{
+  background:var(--ink);color:var(--bg);
+  border:1px solid transparent;
+  transform:scale(1.02);
+  box-shadow:0 24px 64px -32px rgba(28,24,20,0.45);
+}
+.tier-badge{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  padding:7px 14px;background:var(--accent);color:#FFF7F0;
+  font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;
+  border-radius:999px;white-space:nowrap;
+}
+.tier-cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 22px;border-radius:999px;
+  font-size:14px;font-weight:500;transition:transform 0.3s var(--ease);
+}
+.tier-cta:hover{transform:translateY(-2px)}
+
+/* === FAQ === */
+.faq-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:80px;align-items:start}
+@media(max-width:880px){.faq-grid{grid-template-columns:1fr!important;gap:48px!important}.faq-sticky{position:static!important}}
+.faq-item{border-bottom:1px solid var(--hairline)}
+.faq-question{
+  width:100%;text-align:left;padding:32px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.faq-question-text{
+  font-family:var(--font-display);font-size:clamp(20px,1.9vw,26px);
+  font-weight:500;letter-spacing:-0.02em;color:var(--ink);
+}
+.faq-toggle{
+  flex-shrink:0;width:40px;height:40px;border-radius:50%;
+  background:transparent;border:1px solid var(--hairline);
+  color:var(--ink);display:flex;align-items:center;justify-content:center;
+  transition:all 0.4s var(--ease);
+}
+.faq-toggle.open{background:var(--accent);border-color:var(--accent);color:#FFF7F0;transform:rotate(45deg)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height 0.5s var(--ease)}
+.faq-answer.open{max-height:200px}
+.faq-answer p{font-size:16px;color:var(--ink-soft);line-height:1.6;max-width:62ch;padding-bottom:32px;padding-right:64px}
+
+/* === FINAL CTA + FOOTER === */
+.final-cta{
+  background:var(--ink);color:var(--bg);
+  padding-top:var(--section-py);padding-bottom:80px;
+  position:relative;overflow:hidden;
+}
+.email-btn{
+  font-family:var(--font-display);font-size:clamp(20px,2.2vw,30px);
+  font-weight:500;letter-spacing:-0.02em;
+  padding:18px 40px;border-radius:999px;
+  border:1px solid rgba(244,238,227,0.25);
+  display:inline-flex;align-items:center;gap:16px;
+  background:transparent;color:var(--bg);
+  transition:all 0.4s var(--ease);
+}
+.email-btn:hover{background:var(--accent);border-color:var(--accent);color:#FFF7F0}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px}
+@media(max-width:820px){.footer-grid{grid-template-columns:1fr 1fr!important}}
+@media(max-width:480px){.footer-grid{grid-template-columns:1fr!important}}
+
+/* === NOW WIDGET === */
+.now-widget{
+  position:fixed;bottom:24px;left:24px;z-index:60;
+  transform:translateY(20px);opacity:0;
+  transition:all 0.6s var(--ease);
+}
+.now-widget.mounted{transform:translateY(0);opacity:1}
+@media(max-width:720px){.now-widget{display:none!important}}
+.now-pill{
+  display:flex;align-items:center;gap:10;
+  padding:10px 16px 10px 12px;background:var(--ink);color:var(--bg);
+  border-radius:999px;font-size:13px;font-weight:500;
+  box-shadow:0 12px 32px -12px rgba(28,24,20,0.4);
+  border:1px solid rgba(244,238,227,0.08);cursor:pointer;
+}
+.now-popover{
+  position:absolute;bottom:calc(100% + 8px);left:0;
+  width:280px;padding:20px;
+  background:var(--ink);color:var(--bg);
+  border-radius:16px;font-size:13px;line-height:1.5;
+  box-shadow:0 24px 48px -16px rgba(28,24,20,0.4);
+  border:1px solid rgba(244,238,227,0.08);
+  display:none;
+}
+.now-popover.open{display:block}
+.green-dot{position:relative;display:inline-block;width:8px;height:8px;flex-shrink:0}
+.green-dot-inner{position:absolute;inset:0;border-radius:50%;background:#3ABE7A}
+.green-dot-halo{
+  position:absolute;inset:-4px;border-radius:50%;
+  background:rgba(58,190,122,0.3);
+  animation:pulse 2s ease-out infinite;
+}
+
+/* === CUSTOM CURSOR === */
+@media(pointer:fine){body{cursor:none}a,button,[data-cursor]{cursor:none!important}}
+@media(pointer:coarse){.custom-cursor{display:none!important}}
+.cursor-dot{
+  position:fixed;top:0;left:0;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);pointer-events:none;z-index:9999;will-change:transform;
+}
+.cursor-ring{
+  position:fixed;top:0;left:0;width:32px;height:32px;border-radius:50%;
+  border:1.5px solid var(--ink);pointer-events:none;z-index:9998;
+  will-change:transform,width,height;
+  transition:width 0.3s var(--ease),height 0.3s var(--ease),border-color 0.3s,background 0.3s,margin 0.3s var(--ease);
+  mix-blend-mode:difference;opacity:0.55;
+}
+.cursor-label{
+  position:fixed;top:0;left:0;
+  padding:4px 10px;background:var(--ink);color:var(--bg);
+  border-radius:999px;font-size:11px;font-weight:500;
+  letter-spacing:0.05em;text-transform:uppercase;
+  pointer-events:none;z-index:9999;will-change:transform;white-space:nowrap;
+}
+
+/* Section padding */
+.section{padding-top:var(--section-py);padding-bottom:var(--section-py)}
+
+/* Status pill in hero */
+.status-pill{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:8px 14px 8px 10px;background:var(--card);
+  border:1px solid var(--hairline);border-radius:999px;
+  font-size:13px;color:var(--ink-soft);margin-bottom:28px;
+}
+
+/* Trusted by */
+.trusted-by{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:clamp(20px,3vw,40px);padding-top:24px;
+  border-top:1px solid var(--hairline);margin-top:64px;
+}
+</style>
+</head>
+<body>
+<div id="root">
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor-dot custom-cursor" id="cursor-dot"></div>
+<div class="cursor-ring custom-cursor" id="cursor-ring"></div>
+<div class="cursor-label custom-cursor" id="cursor-label" style="display:none"></div>
+
+<!-- NAV -->
+<header id="nav">
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="10" height="10" rx="2" fill="var(--ink)"/>
+        <rect x="15" y="3" width="10" height="10" rx="2" fill="var(--accent)"/>
+        <rect x="3" y="15" width="10" height="10" rx="2" fill="var(--accent)"/>
+        <rect x="15" y="15" width="10" height="10" rx="2" fill="var(--ink)"/>
+      </svg>
+      <span>PixxelNest</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a href="book.html" class="nav-cta">
+      Book a call
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero-section">
+  <div class="container" id="hero-reveal">
+
+    <!-- Status pill -->
+    <div class="status-pill reveal">
+      <span class="green-dot"><span class="green-dot-inner"></span><span class="green-dot-halo"></span></span>
+      Taking 2 projects for July · Booking August now
+    </div>
+
+    <h1 class="reveal reveal-delay-1">
+      A studio for<br>
+      <span class="hero-rotating-word-container">
+        <span class="hero-rotating-word-ghost">the quiet wins.</span>
+        <span class="hero-rotating-word active" data-word="0">the details.</span>
+        <span class="hero-rotating-word" data-word="1">the outliers.</span>
+        <span class="hero-rotating-word" data-word="2">the quiet wins.</span>
+        <span class="hero-rotating-word" data-word="3">the long game.</span>
+      </span>
+    </h1>
+
+    <div class="hero-foot">
+      <p class="reveal reveal-delay-2" style="font-size:clamp(18px,1.6vw,22px);line-height:1.45;color:var(--ink-soft);max-width:46ch;font-weight:400">
+        We're a small, opinionated studio building brands, websites, and campaigns that move the needle, without the agency theatrics.
+      </p>
+      <div class="reveal reveal-delay-3" style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="book.html" class="btn btn-primary">Book a call <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        <a href="work.html" class="btn btn-ghost">See our work</a>
+      </div>
+    </div>
+
+    <!-- Hero visual band -->
+    <div class="hero-tiles reveal reveal-delay-4" id="hero-tiles">
+      <!-- Tile A: Coral -->
+      <div class="hero-tile" id="tile-coral" style="background:linear-gradient(135deg,#E55A3C 0%,#F2A07E 100%)">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.25),transparent 50%)"></div>
+        <!-- Deco circles -->
+        <div style="position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;border:1px solid rgba(255,255,255,0.25);pointer-events:none"></div>
+        <div style="position:absolute;top:-100px;right:-100px;width:320px;height:320px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);pointer-events:none"></div>
+        <div class="hero-tile-overlay" style="top:28px;left:28px;color:#FFF7F0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;font-weight:500;opacity:0.9">Currently</div>
+        <div class="hero-tile-overlay" style="bottom:28px;left:28px;right:28px;font-family:var(--font-serif);font-style:italic;font-size:clamp(28px,3.4vw,48px);color:#FFF7F0;line-height:1.05;font-weight:400;letter-spacing:-0.01em">
+          Crafting a brand<br>for a Lisbon café.
+        </div>
+      </div>
+      <!-- Tile B: Ink -->
+      <div class="hero-tile" style="background:var(--ink);color:var(--bg)">
+        <div class="hero-tile-overlay" style="top:28px;left:28px;right:28px;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.7;font-weight:500;color:var(--bg)">By the numbers</div>
+        <div class="hero-tile-overlay" style="bottom:28px;left:28px;right:28px;display:flex;flex-direction:column;gap:12px;color:var(--bg)">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(244,238,227,0.12)">
+            <div style="font-family:var(--font-display);font-size:clamp(20px,2vw,28px);line-height:1;letter-spacing:-0.03em;font-weight:500">120<span style="color:rgb(241,235,224)">+</span></div>
+            <div style="font-size:12px;opacity:0.65;text-align:right;max-width:55%;line-height:1.3">Brands shipped</div>
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgba(244,238,227,0.12)">
+            <div style="font-family:var(--font-display);font-size:clamp(20px,2vw,28px);line-height:1;letter-spacing:-0.03em;font-weight:500">4.2×</div>
+            <div style="font-size:12px;opacity:0.65;text-align:right;max-width:55%;line-height:1.3">Avg. conversion lift</div>
+          </div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+            <div style="font-family:var(--font-display);font-size:clamp(20px,2vw,28px);line-height:1;letter-spacing:-0.03em;font-weight:500">7 days</div>
+            <div style="font-size:12px;opacity:0.65;text-align:right;max-width:55%;line-height:1.3">Brand sprint average</div>
+          </div>
+        </div>
+      </div>
+      <!-- Tile C: Cream -->
+      <div class="hero-tile" style="background:var(--card-highlight)">
+        <!-- Deco arcs -->
+        <div style="position:absolute;top:-80px;left:-80px;width:240px;height:240px;border-radius:50%;border:1px solid rgba(28,24,20,0.10);pointer-events:none"></div>
+        <div style="position:absolute;top:-120px;left:-120px;width:340px;height:340px;border-radius:50%;border:1px solid rgba(28,24,20,0.06);pointer-events:none"></div>
+        <div class="hero-tile-overlay" style="top:28px;left:28px;right:28px;display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;font-weight:500;opacity:0.85">
+          <span style="color:rgb(244,238,227)">The studio</span>
+        </div>
+        <div class="hero-tile-overlay" style="bottom:28px;left:28px;right:28px;font-family:var(--font-serif);font-style:italic;font-size:clamp(24px,2.6vw,38px);color:var(--ink);line-height:1.05;font-weight:400;letter-spacing:-0.01em">
+          Small team,<br>long hours,<br>quiet rooms.
+        </div>
+      </div>
+    </div>
+
+    <!-- Trusted by -->
+    <div class="trusted-by reveal reveal-delay-5">
+      <span style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:500">Trusted by</span>
+      <span style="font-family:var(--font-display);font-style:normal;font-size:18px;font-weight:600;letter-spacing:-0.02em;color:var(--ink-soft);opacity:0.65;transition:opacity 0.3s;cursor:default" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">FORELAND</span>
+      <span style="font-family:var(--font-serif);font-style:italic;font-size:18px;font-weight:400;letter-spacing:-0.01em;color:var(--ink-soft);opacity:0.65;transition:opacity 0.3s;cursor:default" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Northbound</span>
+      <span style="font-family:var(--font-display);font-style:normal;font-size:18px;font-weight:600;letter-spacing:-0.02em;color:var(--ink-soft);opacity:0.65;transition:opacity 0.3s;cursor:default" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Maison Vie</span>
+      <span style="font-family:var(--font-serif);font-style:italic;font-size:18px;font-weight:400;letter-spacing:-0.01em;color:var(--ink-soft);opacity:0.65;transition:opacity 0.3s;cursor:default" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Halcyon</span>
+      <span style="font-family:var(--font-display);font-style:normal;font-size:18px;font-weight:600;letter-spacing:-0.02em;color:var(--ink-soft);opacity:0.65;transition:opacity 0.3s;cursor:default" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Ortega&Co</span>
+      <span style="font-family:var(--font-serif);font-style:italic;font-size:18px;font-weight:400;letter-spacing:-0.01em;color:var(--ink-soft);opacity:0.65;transition:opacity 0.3s;cursor:default" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.65'">Quiet Studio</span>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span style="display:inline-flex;align-items:center;gap:56px">Landing pages <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Brand identity <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:0.85"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Social content <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Performance ads <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:0.85"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">SEO strategy <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Site care <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:0.85"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Landing pages <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Brand identity <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:0.85"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Social content <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Performance ads <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:0.85"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">SEO strategy <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--accent)"></span></span>
+    <span style="display:inline-flex;align-items:center;gap:56px">Site care <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--ink);opacity:0.85"></span></span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services" class="section">
+  <div class="container" id="services-reveal">
+    <div class="services-head">
+      <div class="reveal">
+        <div class="eyebrow"><span class="eyebrow-dot"></span>Services</div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(40px,5.5vw,80px);line-height:0.98;letter-spacing:-0.04em;font-weight:500;margin-top:20px;max-width:14ch">
+          Everything you need.<br>
+          <span style="font-family:var(--font-serif);font-style:italic;font-weight:400;color:var(--accent)">Nothing you don't.</span>
+        </h2>
+      </div>
+      <p class="reveal reveal-delay-1 services-head-right" style="font-size:17px;color:var(--ink-soft);max-width:38ch;line-height:1.55;justify-self:end">
+        Six focused offerings, each shaped by years of doing the work. Pick one, or stack a few. We move fast and don't waste your retainer.
+      </p>
+    </div>
+
+    <div class="services-grid">
+      <!-- Service 1: Landing Pages (highlighted) -->
+      <div class="reveal reveal-delay-1">
+        <div class="service-card highlighted" onclick="window.location.href='service.html?id=landing-pages'">
+          <div class="service-card-img-wrap">
+            <img src="assets/service-landing.jpg" alt="Landing Pages" class="service-card-img">
+          </div>
+          <h3>Landing Pages</h3>
+          <div class="service-card-subtitle">Built to convert, not just impress.</div>
+          <p class="service-card-body">Design, copy, and build as one tight sprint. Something beautiful that actually converts.</p>
+          <a href="service.html?id=landing-pages" class="service-card-link">Know more <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <!-- Service 2 -->
+      <div class="reveal reveal-delay-2">
+        <div class="service-card" onclick="window.location.href='service.html?id=brand-in-a-week'">
+          <div class="service-card-img-wrap">
+            <img src="assets/service-brand.jpg" alt="Brand-in-a-Week" class="service-card-img">
+          </div>
+          <h3>Brand-in-a-Week</h3>
+          <div class="service-card-subtitle">A full identity in seven days.</div>
+          <p class="service-card-body">Logo, brand book, and ready-to-post social templates. Before your next Monday.</p>
+          <a href="service.html?id=brand-in-a-week" class="service-card-link">Know more <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <!-- Service 3 -->
+      <div class="reveal reveal-delay-3">
+        <div class="service-card" onclick="window.location.href='service.html?id=monthly-social-pack'">
+          <div class="service-card-img-wrap">
+            <img src="assets/service-social.jpg" alt="Monthly Social Pack" class="service-card-img">
+          </div>
+          <h3>Monthly Social Pack</h3>
+          <div class="service-card-subtitle">Your feed, handled.</div>
+          <p class="service-card-body">20 posts, 8 reels, and captions that sound like you on your best day. Every month.</p>
+          <a href="service.html?id=monthly-social-pack" class="service-card-link">Know more <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <!-- Service 4 -->
+      <div class="reveal reveal-delay-1">
+        <div class="service-card" onclick="window.location.href='service.html?id=ads-management'">
+          <div class="service-card-img-wrap">
+            <img src="assets/service-ads.jpg" alt="Ads Management" class="service-card-img">
+          </div>
+          <h3>Ads Management</h3>
+          <div class="service-card-subtitle">Spend that earns its keep.</div>
+          <p class="service-card-body">Setup, creatives, and monthly optimization that treats your budget like it is our own.</p>
+          <a href="service.html?id=ads-management" class="service-card-link">Know more <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <!-- Service 5 -->
+      <div class="reveal reveal-delay-2">
+        <div class="service-card" onclick="window.location.href='service.html?id=seo-starter'">
+          <div class="service-card-img-wrap">
+            <img src="assets/service-seo.jpg" alt="SEO Starter" class="service-card-img">
+          </div>
+          <h3>SEO Starter</h3>
+          <div class="service-card-subtitle">Rank for what actually matters.</div>
+          <p class="service-card-body">Keyword strategy, on-page optimization, and the technical fixes that move your site up.</p>
+          <a href="service.html?id=seo-starter" class="service-card-link">Know more <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <!-- Service 6 -->
+      <div class="reveal reveal-delay-3">
+        <div class="service-card" onclick="window.location.href='service.html?id=website-care-plan'">
+          <div class="service-card-img-wrap">
+            <img src="assets/service-care.jpg" alt="Website Care Plan" class="service-card-img">
+          </div>
+          <h3>Website Care Plan</h3>
+          <div class="service-card-subtitle">Build it once, never babysit it.</div>
+          <p class="service-card-body">Hosting, updates, backups, and edits. Everything running and refreshed as you grow.</p>
+          <a href="service.html?id=website-care-plan" class="service-card-link">Know more <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="section" id="manifesto-reveal">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:96px">
+      <div class="eyebrow" style="justify-content:center"><span class="eyebrow-dot"></span>What we believe</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(40px,5.5vw,80px);line-height:0.98;letter-spacing:-0.04em;font-weight:500;margin-top:20px;max-width:20ch;margin-left:auto;margin-right:auto">
+        Four things we <span style="font-family:var(--font-serif);font-style:italic;font-weight:400;color:var(--accent)">always</span> stand by.
+      </h2>
+    </div>
+    <div>
+      <div class="manifesto-line reveal reveal-delay-1">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;letter-spacing:0.05em">01</div>
+        <h3 class="manifesto-title">Craft over volume.</h3>
+        <p class="manifesto-line-desc" style="font-size:clamp(16px,1.4vw,19px);color:var(--ink-soft);line-height:1.5;max-width:32ch;opacity:0.85">We take two projects a month. Each one gets all of us.</p>
+      </div>
+      <div class="manifesto-line reveal reveal-delay-2">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;letter-spacing:0.05em">02</div>
+        <h3 class="manifesto-title">Strategy lives in the work.</h3>
+        <p class="manifesto-line-desc" style="font-size:clamp(16px,1.4vw,19px);color:var(--ink-soft);line-height:1.5;max-width:32ch;opacity:0.85">Not in a 40-slide deck nobody reads twice.</p>
+      </div>
+      <div class="manifesto-line reveal reveal-delay-3">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;letter-spacing:0.05em">03</div>
+        <h3 class="manifesto-title">Direct, always.</h3>
+        <p class="manifesto-line-desc" style="font-size:clamp(16px,1.4vw,19px);color:var(--ink-soft);line-height:1.5;max-width:32ch;opacity:0.85">You talk to the people doing the work. No account theater.</p>
+      </div>
+      <div class="manifesto-line reveal reveal-delay-4">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;letter-spacing:0.05em">04</div>
+        <h3 class="manifesto-title">Beautiful does the work.</h3>
+        <p class="manifesto-line-desc" style="font-size:clamp(16px,1.4vw,19px);color:var(--ink-soft);line-height:1.5;max-width:32ch;opacity:0.85">Taste is a competitive advantage. We mean it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<section class="numbers-section" id="numbers-reveal">
+  <div class="container">
+    <div class="reveal" style="margin-bottom:64px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:32px">
+      <div>
+        <div class="eyebrow dark"><span class="eyebrow-dot"></span>Receipts</div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(40px,5vw,72px);line-height:0.98;letter-spacing:-0.04em;font-weight:500;margin-top:20px;max-width:18ch">
+          Numbers we're <span style="font-family:var(--font-serif);font-style:italic;color:var(--accent-soft);font-weight:400">quietly</span> proud of.
+        </h2>
+      </div>
+      <p style="font-size:15px;opacity:0.6;max-width:30ch;line-height:1.55">Updated quarterly. We'd rather show the work than talk about it.</p>
+    </div>
+    <div class="stats-grid">
+      <div class="reveal reveal-delay-1" style="padding:40px 24px 40px 0">
+        <div style="font-family:var(--font-display);font-size:clamp(48px,6vw,88px);font-weight:500;letter-spacing:-0.04em;line-height:0.95;margin-bottom:16px">120+</div>
+        <div style="font-size:14px;opacity:0.65;letter-spacing:-0.005em">Brands launched</div>
+      </div>
+      <div class="reveal reveal-delay-2" style="padding:40px 24px 40px 32px;border-right:1px solid rgba(244,238,227,0.15);border-left:1px solid rgba(244,238,227,0.15)">
+        <div style="font-family:var(--font-display);font-size:clamp(48px,6vw,88px);font-weight:500;letter-spacing:-0.04em;line-height:0.95;margin-bottom:16px">7 days</div>
+        <div style="font-size:14px;opacity:0.65;letter-spacing:-0.005em">Average brand sprint</div>
+      </div>
+      <div class="reveal reveal-delay-3" style="padding:40px 24px 40px 32px;border-right:1px solid rgba(244,238,227,0.15)">
+        <div style="font-family:var(--font-display);font-size:clamp(48px,6vw,88px);font-weight:500;letter-spacing:-0.04em;line-height:0.95;margin-bottom:16px">4.2×</div>
+        <div style="font-size:14px;opacity:0.65;letter-spacing:-0.005em">Avg. conversion lift</div>
+      </div>
+      <div class="reveal reveal-delay-4" style="padding:40px 0 40px 32px">
+        <div style="font-family:var(--font-display);font-size:clamp(48px,6vw,88px);font-weight:500;letter-spacing:-0.04em;line-height:0.95;margin-bottom:16px">98%</div>
+        <div style="font-size:14px;opacity:0.65;letter-spacing:-0.005em">Client retention</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="section" id="process-reveal">
+  <div class="container">
+    <div class="process-grid">
+      <div class="reveal reveal-delay-1" style="padding:40px 24px 0 0">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;margin-bottom:20px;letter-spacing:0.02em">01</div>
+        <h3 style="font-family:var(--font-display);font-size:clamp(28px,2.6vw,40px);font-weight:500;letter-spacing:-0.03em;margin-bottom:16px;line-height:1">Listen</h3>
+        <p style="font-size:15px;color:var(--ink-soft);line-height:1.55;opacity:0.85">A real call. We learn what you sell, who you sell to, and what hurts.</p>
+      </div>
+      <div class="reveal reveal-delay-2" style="padding:40px 24px 0 32px;border-left:1px solid var(--hairline);border-right:1px solid var(--hairline)">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;margin-bottom:20px;letter-spacing:0.02em">02</div>
+        <h3 style="font-family:var(--font-display);font-size:clamp(28px,2.6vw,40px);font-weight:500;letter-spacing:-0.03em;margin-bottom:16px;line-height:1">Shape</h3>
+        <p style="font-size:15px;color:var(--ink-soft);line-height:1.55;opacity:0.85">A direction memo with mood, structure, and the few opinions we feel strongly about.</p>
+      </div>
+      <div class="reveal reveal-delay-3" style="padding:40px 24px 0 32px;border-right:1px solid var(--hairline)">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;margin-bottom:20px;letter-spacing:0.02em">03</div>
+        <h3 style="font-family:var(--font-display);font-size:clamp(28px,2.6vw,40px);font-weight:500;letter-spacing:-0.03em;margin-bottom:16px;line-height:1">Make</h3>
+        <p style="font-size:15px;color:var(--ink-soft);line-height:1.55;opacity:0.85">Design and build in tight, focused sprints. You see real work, not slide-deck theater.</p>
+      </div>
+      <div class="reveal reveal-delay-4" style="padding:40px 0 0 32px">
+        <div style="font-family:var(--font-display);font-size:14px;color:var(--accent);font-weight:500;margin-bottom:20px;letter-spacing:0.02em">04</div>
+        <h3 style="font-family:var(--font-display);font-size:clamp(28px,2.6vw,40px);font-weight:500;letter-spacing:-0.03em;margin-bottom:16px;line-height:1">Ship</h3>
+        <p style="font-size:15px;color:var(--ink-soft);line-height:1.55;opacity:0.85">Launch, measure, iterate. We stay involved until the numbers actually move.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="padding-top:var(--section-py);padding-bottom:var(--section-py);background:var(--bg-soft);border-top:1px solid var(--hairline-soft);border-bottom:1px solid var(--hairline-soft);overflow:hidden" id="testimonials-reveal">
+  <div class="container">
+    <div class="reveal" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;flex-wrap:wrap;gap:24px">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-dot"></span>Kind words</div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(40px,5.5vw,76px);line-height:0.98;letter-spacing:-0.04em;font-weight:500;margin-top:20px;max-width:14ch">
+          From people<br>who'd know.
+        </h2>
+      </div>
+      <div style="font-size:14px;color:var(--muted);max-width:32ch;line-height:1.55">
+        Pulled from kickoff emails, slack DMs, and the occasional 11pm voice note.
+      </div>
+    </div>
+  </div>
+  <div class="quote-scroll reveal reveal-delay-1">
+    <article class="quote-card">
+      <div>
+        <div style="font-family:var(--font-serif);font-size:88px;line-height:0.5;color:var(--accent);margin-bottom:8px;font-style:italic">"</div>
+        <blockquote style="font-family:var(--font-display);font-size:clamp(20px,1.7vw,26px);line-height:1.3;letter-spacing:-0.02em;font-weight:500;color:var(--ink);margin:0">They shipped our entire brand in seven days. Seven. Nothing felt rushed, nothing felt off.</blockquote>
+      </div>
+      <footer style="margin-top:32px;padding-top:24px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink)">Maya Okafor</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">Founder, Foreland Coffee</div>
+        </div>
+        <div style="font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;font-weight:500;text-align:right;max-width:120px">Brand sprint, 7 days</div>
+      </footer>
+    </article>
+    <article class="quote-card">
+      <div>
+        <div style="font-family:var(--font-serif);font-size:88px;line-height:0.5;color:var(--accent);margin-bottom:8px;font-style:italic">"</div>
+        <blockquote style="font-family:var(--font-display);font-size:clamp(20px,1.7vw,26px);line-height:1.3;letter-spacing:-0.02em;font-weight:500;color:var(--ink);margin:0">The first agency I have worked with that actually cared about our conversion rate, not their portfolio shot.</blockquote>
+      </div>
+      <footer style="margin-top:32px;padding-top:24px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink)">Daniel Reeves</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">CEO, Northbound Outdoor</div>
+        </div>
+        <div style="font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;font-weight:500;text-align:right;max-width:120px">Landing + Ads, 6 weeks</div>
+      </footer>
+    </article>
+    <article class="quote-card">
+      <div>
+        <div style="font-family:var(--font-serif);font-size:88px;line-height:0.5;color:var(--accent);margin-bottom:8px;font-style:italic">"</div>
+        <blockquote style="font-family:var(--font-display);font-size:clamp(20px,1.7vw,26px);line-height:1.3;letter-spacing:-0.02em;font-weight:500;color:var(--ink);margin:0">Our feed went from chore to flex. The voice they wrote sounds more like us than we do.</blockquote>
+      </div>
+      <footer style="margin-top:32px;padding-top:24px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink)">Camille Bertrand</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">Creative Director, Maison Vie</div>
+        </div>
+        <div style="font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;font-weight:500;text-align:right;max-width:120px">Social retainer, 12 months</div>
+      </footer>
+    </article>
+    <article class="quote-card">
+      <div>
+        <div style="font-family:var(--font-serif);font-size:88px;line-height:0.5;color:var(--accent);margin-bottom:8px;font-style:italic">"</div>
+        <blockquote style="font-family:var(--font-display);font-size:clamp(20px,1.7vw,26px);line-height:1.3;letter-spacing:-0.02em;font-weight:500;color:var(--ink);margin:0">I have hired four studios in my career. PixxelNest is the only one I have re-hired three times.</blockquote>
+      </div>
+      <footer style="margin-top:32px;padding-top:24px;border-top:1px solid var(--hairline);display:flex;justify-content:space-between;align-items:flex-end;gap:16px">
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink)">James Hwang</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">COO, Halcyon Health</div>
+        </div>
+        <div style="font-size:11px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;font-weight:500;text-align:right;max-width:120px">Multi-project partner</div>
+      </footer>
+    </article>
+    <div style="flex:0 0 clamp(20px,4vw,56px)"></div>
+  </div>
+</section>
+
+<!-- CASE STUDIES -->
+<section id="work" class="section" id="work-reveal">
+  <div class="container">
+    <div class="reveal" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;flex-wrap:wrap;gap:24px">
+      <div>
+        <div class="eyebrow"><span class="eyebrow-dot"></span>Selected work</div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(40px,5.5vw,80px);line-height:0.98;letter-spacing:-0.04em;font-weight:500;margin-top:20px;max-width:16ch">
+          The work, <span style="font-family:var(--font-serif);font-style:italic;color:var(--accent);font-weight:400">not the talk</span>.
+        </h2>
+      </div>
+      <a href="work.html" class="btn btn-ghost">See full archive <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+    </div>
+
+    <div class="cases-grid">
+      <!-- Big case card: Foreland Coffee -->
+      <div class="case-cell reveal reveal-delay-1">
+        <div class="case-card" style="background:linear-gradient(135deg,#D4623F 0%,#8B3A22 100%);min-height:540px">
+          <img src="assets/case-foreland-coffee.jpg" alt="Foreland Coffee" class="case-card-img">
+          <div class="case-card-scrim"></div>
+          <div class="case-card-tag">Brand · Web</div>
+          <div class="case-card-info">
+            <div class="case-card-client" style="font-size:clamp(28px,3vw,42px)">Foreland Coffee</div>
+            <div class="case-card-desc">A specialty roaster's rebrand and DTC site that 3.4×'d email signups.</div>
+            <a href="#" onclick="event.preventDefault()" class="case-card-cta">View case <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+          </div>
+          <div class="case-metrics">
+            <div class="case-metric"><div style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-0.02em;line-height:1">3.4×</div><div style="font-size:10px;opacity:0.7;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500">Email signups</div></div>
+            <div class="case-metric"><div style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-0.02em;line-height:1">+62%</div><div style="font-size:10px;opacity:0.7;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500">AOV lift</div></div>
+            <div class="case-metric"><div style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-0.02em;line-height:1">14d</div><div style="font-size:10px;opacity:0.7;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500">Sprint</div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Stack of two small case cards -->
+      <div class="cases-stack">
+        <div class="case-cell reveal reveal-delay-2">
+          <div class="case-card" style="background:#1F2A24;min-height:262px">
+            <img src="assets/case-northbound-outdoor.jpg" alt="Northbound Outdoor" class="case-card-img">
+            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.6);pointer-events:none"></div>
+            <div class="case-card-scrim"></div>
+            <div class="case-card-tag">Landing · Ads</div>
+            <div class="case-card-info">
+              <div class="case-card-client" style="font-size:clamp(22px,2vw,28px)">Northbound Outdoor</div>
+              <div class="case-card-desc">A campaign page + ads that cut CAC by 41% across three quarters.</div>
+              <a href="#" onclick="event.preventDefault()" class="case-card-cta">View case <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+            </div>
+            <div class="case-metrics">
+              <div class="case-metric"><div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em;line-height:1">-41%</div><div style="font-size:10px;opacity:0.7;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500">CAC</div></div>
+              <div class="case-metric"><div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em;line-height:1">2.8×</div><div style="font-size:10px;opacity:0.7;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500">CTR</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="case-cell reveal reveal-delay-3">
+          <div class="case-card" style="background:#EFE6D6;min-height:262px">
+            <img src="assets/case-maison-vie.jpg" alt="Maison Vie" class="case-card-img">
+            <div class="case-card-scrim"></div>
+            <div class="case-card-tag">Social</div>
+            <div class="case-card-info">
+              <div class="case-card-client" style="font-size:clamp(22px,2vw,28px)">Maison Vie</div>
+              <div class="case-card-desc">12 months of editorial-grade Instagram for a Paris-based atelier.</div>
+              <a href="#" onclick="event.preventDefault()" class="case-card-cta">View case <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+            </div>
+            <div class="case-metrics">
+              <div class="case-metric"><div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em;line-height:1">4.1×</div><div style="font-size:10px;opacity:0.7;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500">Followers</div></div>
+              <div class="case-metric"><div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.02em;line-height:1">12mo</div><div style="font-size:10px;opacity:0.7;margin-top:4px;letter-spacing:0.08em;text-transform:uppercase;font-weight:500">Retainer</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRESS STRIP -->
+<div style="padding:32px 0;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);background:var(--bg)">
+  <div class="container">
+    <div class="press-grid">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);font-weight:600">Awwwards</div>
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);letter-spacing:-0.01em">Site of the Day, 3x</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;padding-left:24px;border-left:1px solid var(--hairline)">
+        <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);font-weight:600">Brand New</div>
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);letter-spacing:-0.01em">Featured rebrand, 2024</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;padding-left:24px;border-left:1px solid var(--hairline)">
+        <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);font-weight:600">It's Nice That</div>
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);letter-spacing:-0.01em">Studio of the Week</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;padding-left:24px;border-left:1px solid var(--hairline)">
+        <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);font-weight:600">CSS Design</div>
+        <div style="font-family:var(--font-display);font-size:16px;font-weight:500;color:var(--ink);letter-spacing:-0.01em">Best Studio Site, 2025</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section" id="pricing-reveal">
+  <div class="container">
+    <div class="reveal" style="text-align:center;margin-bottom:64px">
+      <div class="eyebrow" style="justify-content:center"><span class="eyebrow-dot"></span>Pricing</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(40px,5.5vw,80px);line-height:0.98;letter-spacing:-0.04em;font-weight:500;margin-top:20px;max-width:18ch;margin-left:auto;margin-right:auto">
+        Straight rates, no <span style="font-family:var(--font-serif);font-style:italic;color:var(--accent);font-weight:400">surprises</span>.
+      </h2>
+    </div>
+    <div class="pricing-grid">
+      <!-- Sprint -->
+      <div class="reveal reveal-delay-1">
+        <div class="tier-card">
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px">Sprint</div>
+          <div style="font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.5">A focused engagement to ship one thing, fast.</div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:36px">
+            <span style="font-size:18px;opacity:0.6">$</span>
+            <span style="font-family:var(--font-display);font-size:clamp(48px,5.5vw,72px);font-weight:500;letter-spacing:-0.04em;line-height:1">2,400</span>
+            <span style="font-size:14px;opacity:0.6">one-time</span>
+          </div>
+          <div style="height:1px;background:var(--hairline);margin-bottom:24px"></div>
+          <ul style="list-style:none;padding:0;margin:0;flex:1;margin-bottom:32px">
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>One landing page or brand sprint</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>7 days, start to ship</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>One round of revisions</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Direct Slack channel</li>
+          </ul>
+          <a href="book.html" class="tier-cta" style="background:var(--ink);color:var(--bg)">Start a project <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <!-- Studio (highlighted) -->
+      <div class="reveal reveal-delay-2">
+        <div class="tier-card highlighted" style="position:relative">
+          <div class="tier-badge">Most picked</div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px">Studio</div>
+          <div style="font-size:14px;color:rgba(244,238,227,0.65);margin-bottom:28px;line-height:1.5">A retainer for brands that need ongoing craft.</div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:36px">
+            <span style="font-size:18px;opacity:0.6">$</span>
+            <span style="font-family:var(--font-display);font-size:clamp(48px,5.5vw,72px);font-weight:500;letter-spacing:-0.04em;line-height:1">6,800</span>
+            <span style="font-size:14px;opacity:0.6">/month</span>
+          </div>
+          <div style="height:1px;background:rgba(244,238,227,0.15);margin-bottom:24px"></div>
+          <ul style="list-style:none;padding:0;margin:0;flex:1;margin-bottom:32px">
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:rgba(244,238,227,0.85)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent-soft)"></span>Anything in the services menu</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:rgba(244,238,227,0.85)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent-soft)"></span>Up to 80 hrs/month, async-first</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:rgba(244,238,227,0.85)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent-soft)"></span>Weekly check-ins, no standups</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:rgba(244,238,227,0.85)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent-soft)"></span>Founder + senior designer</li>
+          </ul>
+          <a href="book.html" class="tier-cta" style="background:var(--accent);color:#FFF7F0">Start a project <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+      <!-- Custom -->
+      <div class="reveal reveal-delay-3">
+        <div class="tier-card">
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:600;letter-spacing:-0.02em;margin-bottom:8px">Custom</div>
+          <div style="font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.5">For longer programs and partnerships.</div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:36px">
+            <span style="font-family:var(--font-display);font-size:clamp(36px,4vw,56px);font-weight:500;letter-spacing:-0.04em;line-height:1">Let's talk</span>
+          </div>
+          <div style="height:1px;background:var(--hairline);margin-bottom:24px"></div>
+          <ul style="list-style:none;padding:0;margin:0;flex:1;margin-bottom:32px">
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Multi-quarter engagement</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Dedicated cross-functional team</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Quarterly strategy planning</li>
+            <li style="display:flex;align-items:flex-start;gap:12px;font-size:14px;padding:10px 0;color:var(--ink-soft)"><span style="flex-shrink:0;margin-top:7px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>Custom scope, custom rate</li>
+          </ul>
+          <a href="book.html" class="tier-cta" style="background:var(--ink);color:var(--bg)">Get in touch <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-4" style="text-align:center;margin-top:48px;font-size:14px;color:var(--muted)">
+      All projects start with a free 30-min call. No deck, no pitch, just a conversation.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="section" id="faq-reveal">
+  <div class="container">
+    <div class="faq-grid">
+      <div class="reveal faq-sticky" style="position:sticky;top:120px">
+        <div class="eyebrow"><span class="eyebrow-dot"></span>FAQ</div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(40px,5vw,72px);line-height:0.98;letter-spacing:-0.04em;font-weight:500;margin-top:20px">
+          Asked & <span style="font-family:var(--font-serif);font-style:italic;color:var(--accent);font-weight:400">answered</span>.
+        </h2>
+        <p style="margin-top:28px;font-size:15px;color:var(--ink-soft);line-height:1.6;max-width:32ch">
+          Still wondering? Drop us a line and a human will write you back, usually same day.
+        </p>
+      </div>
+      <div class="reveal reveal-delay-1" id="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-question-text">How long does a typical project take?</span>
+            <span class="faq-toggle open"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></span>
+          </button>
+          <div class="faq-answer open"><p>Sprints ship in 7 to 14 days. Brand-in-a-Week is exactly that. Larger builds run 4 to 8 weeks. We will tell you upfront and we hit the dates.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-question-text">Who actually does the work?</span>
+            <span class="faq-toggle"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></span>
+          </button>
+          <div class="faq-answer"><p>A founder + senior designer on every project. No juniors hidden behind account managers, no outsourcing without telling you.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-question-text">Do you work with early-stage startups?</span>
+            <span class="faq-toggle"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></span>
+          </button>
+          <div class="faq-answer"><p>Yes, about half our roster is pre-Series A. We have a soft spot for founders who care about the details.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-question-text">What about ongoing edits after launch?</span>
+            <span class="faq-toggle"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></span>
+          </button>
+          <div class="faq-answer"><p>Our Website Care plan covers that. Or roll it into a Studio retainer and we will keep iterating with you.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFAQ(this)">
+            <span class="faq-question-text">Can I see proposals before I commit?</span>
+            <span class="faq-toggle"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></span>
+          </button>
+          <div class="faq-answer"><p>Always. The first call is free, the scope memo is free, and you only pay once you have read everything and said yes.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA + FOOTER -->
+<section id="contact" class="final-cta" id="contact-reveal">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="eyebrow dark" style="justify-content:center"><span class="eyebrow-dot"></span>Let's begin</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(64px,12vw,200px);line-height:0.88;letter-spacing:-0.05em;font-weight:500;margin:32px 0 48px">
+        Let's work<br>
+        <span style="font-family:var(--font-serif);font-style:italic;font-weight:400;color:var(--accent-soft);letter-spacing:-0.03em">together.</span>
+      </h2>
+      <div style="display:inline-flex;flex-direction:column;align-items:center;gap:24px">
+        <a href="mailto:hello@pixxelnest.studio" class="email-btn">
+          hello@pixxelnest.studio
+          <svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+        </a>
+        <div style="font-size:14px;opacity:0.5">Or book a 30-min intro call directly.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer inside -->
+  <div class="container" style="margin-top:160px;padding-top:40px;border-top:1px solid rgba(244,238,227,0.15)">
+    <div class="footer-grid">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;font-weight:600;font-size:18px;letter-spacing:-0.02em;margin-bottom:16px;font-family:var(--font-display)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="10" height="10" rx="2" fill="var(--bg)"/>
+            <rect x="15" y="3" width="10" height="10" rx="2" fill="var(--accent)"/>
+            <rect x="3" y="15" width="10" height="10" rx="2" fill="var(--accent)"/>
+            <rect x="15" y="15" width="10" height="10" rx="2" fill="var(--bg)"/>
+          </svg>
+          <span>PixxelNest</span>
+        </div>
+        <p style="font-size:14px;opacity:0.55;max-width:32ch;line-height:1.5">
+          A small studio building brands and websites with care. Brooklyn, NY · Working worldwide.
+        </p>
+      </div>
+      <div>
+        <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.5;margin-bottom:16px">Studio</div>
+        <a href="#services" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">Services</a>
+        <a href="#work" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">Work</a>
+        <a href="#process" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">Process</a>
+        <a href="#pricing" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">Pricing</a>
+      </div>
+      <div>
+        <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.5;margin-bottom:16px">Follow</div>
+        <a href="#" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">Instagram <span style="opacity:0.4">↗</span></a>
+        <a href="#" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">Are.na <span style="opacity:0.4">↗</span></a>
+        <a href="#" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">Dribbble <span style="opacity:0.4">↗</span></a>
+        <a href="#" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">LinkedIn <span style="opacity:0.4">↗</span></a>
+      </div>
+      <div>
+        <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.5;margin-bottom:16px">Contact</div>
+        <a href="mailto:hello@pixxelnest.studio" style="display:block;font-size:14px;padding:6px 0;opacity:0.8">hello@pixxelnest.studio</a>
+        <div style="font-size:14px;padding:6px 0;opacity:0.55">241 Wythe Ave, BK</div>
+        <div style="font-size:14px;padding:6px 0;opacity:0.55">Mon-Fri, 9 to 6 ET</div>
+      </div>
+    </div>
+    <div style="margin-top:64px;padding-top:32px;border-top:1px solid rgba(244,238,227,0.1);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:13px;opacity:0.45">
+      <span>© 2026 PixxelNest Studio. All rights reserved.</span>
+      <span>Made slowly, on purpose, in Brooklyn.</span>
+    </div>
+  </div>
+</section>
+
+<!-- NOW WIDGET -->
+<div class="now-widget" id="now-widget">
+  <div class="now-popover" id="now-popover">
+    <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;opacity:0.55;margin-bottom:12px;font-weight:500">This week at the studio</div>
+    <div style="display:flex;gap:8px;padding:6px 0"><span style="color:var(--accent-soft)">○</span><span style="opacity:0.85">Foreland Coffee, site final review</span></div>
+    <div style="display:flex;gap:8px;padding:6px 0"><span style="color:var(--accent-soft)">○</span><span style="opacity:0.85">Maison Vie, Q3 social drop</span></div>
+    <div style="display:flex;gap:8px;padding:6px 0"><span style="color:var(--accent-soft)">○</span><span style="opacity:0.85">Northbound, ad creative round 2</span></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(244,238,227,0.1);font-size:12px;opacity:0.5">Updated Mon, 9:42am ET</div>
+  </div>
+  <button class="now-pill" id="now-pill" onclick="toggleNow()">
+    <span class="green-dot"><span class="green-dot-inner"></span><span class="green-dot-halo"></span></span>
+    Now: shipping a coffee brand
+    <span id="now-chevron" style="opacity:0.5;margin-left:4px;transition:transform 0.3s;display:inline-block">⌃</span>
+  </button>
+</div>
+
+</div><!-- #root -->
+
+<script>
+// ============================================================
+// SCROLL REVEAL
+// ============================================================
+(function() {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+  document.querySelectorAll('.reveal').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < window.innerHeight * 0.95) el.classList.add('in');
+    else io.observe(el);
+  });
+})();
+
+// ============================================================
+// NAV SCROLL STATE
+// ============================================================
+(function() {
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 30);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+// ============================================================
+// HERO PARALLAX
+// ============================================================
+(function() {
+  const tiles = document.querySelectorAll('.hero-tile');
+  const mults = [-0.08, -0.04, -0.06];
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    tiles.forEach((t, i) => { t.style.transform = `translateY(${y * (mults[i] || 0)}px)`; });
+  }, { passive: true });
+})();
+
+// ============================================================
+// ROTATING WORD
+// ============================================================
+(function() {
+  const words = document.querySelectorAll('.hero-rotating-word');
+  let idx = 0;
+  setInterval(() => {
+    words[idx].classList.remove('active');
+    idx = (idx + 1) % words.length;
+    words[idx].classList.add('active');
+  }, 2400);
+})();
+
+// ============================================================
+// FAQ
+// ============================================================
+function toggleFAQ(btn) {
+  const item = btn.parentElement;
+  const answer = item.querySelector('.faq-answer');
+  const toggle = item.querySelector('.faq-toggle');
+  const isOpen = answer.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.faq-toggle').forEach(t => t.classList.remove('open'));
+  // Open this one if it was closed
+  if (!isOpen) { answer.classList.add('open'); toggle.classList.add('open'); }
+}
+
+// ============================================================
+// NOW WIDGET
+// ============================================================
+function toggleNow() {
+  const popover = document.getElementById('now-popover');
+  const chevron = document.getElementById('now-chevron');
+  const open = popover.classList.toggle('open');
+  chevron.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+setTimeout(() => {
+  document.getElementById('now-widget').classList.add('mounted');
+}, 2000);
+
+// ============================================================
+// CUSTOM CURSOR
+// ============================================================
+(function() {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  const label = document.getElementById('cursor-label');
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+
+  const onMove = e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    dot.style.transform = `translate3d(${mouseX - 3}px,${mouseY - 3}px,0)`;
+    label.style.transform = `translate3d(${mouseX + 18}px,${mouseY + 18}px,0)`;
+  };
+  const tick = () => {
+    ringX += (mouseX - ringX) * 0.18;
+    ringY += (mouseY - ringY) * 0.18;
+    ring.style.transform = `translate3d(${ringX - 16}px,${ringY - 16}px,0)`;
+    requestAnimationFrame(tick);
+  };
+  tick();
+  const onOver = e => {
+    const t = e.target.closest('a,button,[data-cursor]');
+    if (t) {
+      ring.style.width = '52px'; ring.style.height = '52px';
+      ring.style.marginLeft = '-10px'; ring.style.marginTop = '-10px';
+      ring.style.borderColor = 'var(--accent)';
+      ring.style.background = 'rgba(229,90,60,0.06)';
+      const lbl = t.getAttribute('data-cursor');
+      if (lbl) { label.textContent = lbl; label.style.display = 'block'; }
+    } else {
+      ring.style.width = '32px'; ring.style.height = '32px';
+      ring.style.marginLeft = '0'; ring.style.marginTop = '0';
+      ring.style.borderColor = 'var(--ink)'; ring.style.background = 'transparent';
+      label.style.display = 'none';
+    }
+  };
+  window.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseover', onOver);
+})();
 </script>
 </body>
 </html>
